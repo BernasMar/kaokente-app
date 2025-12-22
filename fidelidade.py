@@ -46,7 +46,7 @@ def log_transaction(df, telemovel, desc, valor):
 st.set_page_config(page_title="Kão Kente Fidelidade", page_icon="🌭")
 
 # Título e Logo (Simulado com texto)
-st.title("🌭 Kão Kente - Clube de Pontos")
+st.title("🌭 Kão Kente - Clube de Pontos (Google)")
 
 # Menu lateral para escolher o modo (Cliente ou Dono)
 menu = st.sidebar.selectbox("Escolha o Acesso", ["Área do Cliente", "Área do Dono (Admin)"])
