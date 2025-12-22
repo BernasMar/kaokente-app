@@ -1,13 +1,15 @@
 import streamlit as st
 import pandas as pd
 from datetime import datetime
-import os
+from streamlit_gsheets import GSheetsConnection
 
-# --- CONFIGURAÇÃO E DADOS ---
-# Nome do ficheiro onde guardamos os dados (funciona como base de dados simples)
-DATA_FILE = 'kaokente_data.csv'
+# --- CONFIGURAÇÃO DA PÁGINA ---
+st.set_page_config(page_title="Kão Kente Fidelidade", page_icon="🌭")
 
-# Ementa de Prémios (Exemplos baseados no teu restaurante)
+# --- LIGAÇÃO AO GOOGLE SHEETS ---
+# ttl=0 é o segredo: obriga a ir buscar dados frescos ao Google SEMPRE que a app corre
+conn = st.connection("gsheets", type=GSheetsConnection)
+
 PREMIOS = {
     "Bebida de Cápsula": 50,
     "Dose de Batatas Fritas": 100,
@@ -16,154 +18,108 @@ PREMIOS = {
     "Francesinha Especial": 600
 }
 
-# Função para carregar dados
 def load_data():
-    if not os.path.exists(DATA_FILE):
-        # Cria um ficheiro vazio se não existir
-        df = pd.DataFrame(columns=["Telemovel", "Nome", "Pontos", "Historico"])
-        df.to_csv(DATA_FILE, index=False)
+    try:
+        # Lê a folha "Sheet1". Se der erro, devolve tabela vazia.
+        df = conn.read(worksheet="Sheet1", ttl=0)
+        
+        # Se a folha vier vazia ou nula, cria a estrutura
+        if df is None or df.empty:
+            return pd.DataFrame(columns=["Telemovel", "Nome", "Pontos", "Historico"])
+            
+        # Limpeza de dados para garantir que números são números
+        df['Telemovel'] = pd.to_numeric(df['Telemovel'], errors='coerce')
+        df['Pontos'] = pd.to_numeric(df['Pontos'], errors='coerce').fillna(0).astype(int)
+        df['Historico'] = df['Historico'].astype(str).replace('nan', '')
+        # Remove linhas vazias que o Google às vezes cria
+        df = df.dropna(subset=['Telemovel'])
         return df
-    return pd.read_csv(DATA_FILE)
+    except Exception as e:
+        st.error(f"⚠️ Erro ao LER dados: {e}")
+        return pd.DataFrame(columns=["Telemovel", "Nome", "Pontos", "Historico"])
 
-# Função para salvar dados
 def save_data(df):
-    df.to_csv(DATA_FILE, index=False)
+    try:
+        # Escreve os dados na folha "Sheet1"
+        conn.update(worksheet="Sheet1", data=df)
+        # Limpa a cache para garantir que a próxima leitura vê estes dados novos
+        st.cache_data.clear()
+    except Exception as e:
+        st.error(f"⚠️ Erro ao GRAVAR dados: {e}")
 
-# Função para registar transação no histórico
-def log_transaction(df, telemovel, desc, valor):
-    idx = df[df['Telemovel'] == telemovel].index[0]
-    hist_atual = str(df.at[idx, 'Historico'])
-    if hist_atual == "nan": hist_atual = ""
-    
-    data_hoje = datetime.now().strftime("%d/%m %H:%M")
-    novo_log = f"{data_hoje} | {desc} | {valor} pts"
-    
-    # Adiciona ao histórico (separado por quebra de linha)
-    df.at[idx, 'Historico'] = novo_log + "\n" + hist_atual
-    return df
-
-# --- INTERFACE DA APLICAÇÃO ---
-st.set_page_config(page_title="Kão Kente Fidelidade", page_icon="🌭")
-
-# Título e Logo (Simulado com texto)
+# --- TÍTULO E DEBUG ---
 st.title("🌭 Kão Kente - Clube de Pontos (Google)")
 
-# Menu lateral para escolher o modo (Cliente ou Dono)
-menu = st.sidebar.selectbox("Escolha o Acesso", ["Área do Cliente", "Área do Dono (Admin)"])
+# --- DEBUGGER (Só para tu veres se está a funcionar) ---
+with st.expander("🔧 Área de Diagnóstico (Dono)"):
+    st.write("Se clicares no botão abaixo, vamos tentar escrever uma linha de teste no Google Sheets.")
+    if st.button("Testar Gravação no Google Sheets"):
+        try:
+            # Cria um dado de teste
+            teste_df = pd.DataFrame([{
+                "Telemovel": 123456789, 
+                "Nome": "Teste Conexão", 
+                "Pontos": 10, 
+                "Historico": "Teste"
+            }])
+            save_data(teste_df)
+            st.success("Comando de gravação enviado! Vai ver o teu Google Sheet agora.")
+        except Exception as e:
+            st.error(f"Erro no teste: {e}")
 
+# --- LÓGICA DA APP ---
+menu = st.sidebar.selectbox("Escolha o Acesso", ["Área do Cliente", "Área do Dono (Admin)"])
 df = load_data()
 
 # --- ÁREA DO CLIENTE ---
 if menu == "Área do Cliente":
     st.header("Bem-vindo Cliente!")
-    phone_input = st.text_input("Insira o seu nº de telemóvel para entrar:", max_chars=9)
+    phone_input = st.text_input("Insira o seu nº de telemóvel:", max_chars=9)
     
-    if st.button("Ver Meus Pontos"):
-        user_data = df[df['Telemovel'] == int(phone_input)] if phone_input.isdigit() else pd.DataFrame()
-        
-        if not user_data.empty:
-            pontos = user_data.iloc[0]['Pontos']
-            nome = user_data.iloc[0]['Nome']
-            historico = user_data.iloc[0]['Historico']
-            
-            st.success(f"Olá, {nome}!")
-            
-            # Mostrar saldo em destaque
-            st.metric(label="O teu Saldo de Pontos", value=f"{pontos} ⭐")
-            
-            # Barra de progresso para o próximo prémio grande
-            st.write("Progresso para Menu Hambúrguer (400 pts):")
-            progresso = min(pontos / 400, 1.0)
-            st.progress(progresso)
-            
-            # Tabela de Prémios
-            st.subheader("🎁 O que podes trocar:")
-            for premio, custo in PREMIOS.items():
-                if pontos >= custo:
-                    st.write(f"✅ **{premio}** ({custo} pts) - Podes pedir!")
-                else:
-                    st.write(f"🔒 {premio} ({custo} pts) - Faltam {custo - pontos}")
-            
-            st.info("ℹ️ Para trocar pontos, mostra este ecrã ao balcão!")
-            
-            # Histórico
-            with st.expander("Ver meu histórico de movimentos"):
-                st.text(historico)
-                
-        else:
-            st.error("Cliente não encontrado. Peça ao staff para criar conta na sua próxima encomenda!")
+    if st.button("Ver Pontos"):
+        if phone_input.isdigit():
+            user_data = df[df['Telemovel'] == int(phone_input)]
+            if not user_data.empty:
+                pontos = user_data.iloc[0]['Pontos']
+                nome = user_data.iloc[0]['Nome']
+                st.success(f"Olá, {nome}!")
+                st.metric(label="Teus Pontos", value=f"{pontos} ⭐")
+                st.text(f"Histórico:\n{user_data.iloc[0]['Historico']}")
+            else:
+                st.error("Cliente não encontrado.")
 
-# --- ÁREA DO DONO (ADMIN) ---
+# --- ÁREA DO DONO ---
 elif menu == "Área do Dono (Admin)":
-    st.header("Gestão Kão Kente")
-    password = st.sidebar.text_input("Password Admin", type="password")
+    st.header("Gestão")
+    # Tenta ler a password dos segredos, se não existir usa uma default para não crashar
+    senha_secreta = st.secrets.get("admin_password", "admin")
     
-    if password == st.secrets["admin_password"]:
+    password = st.sidebar.text_input("Password", type="password")
+    if password == senha_secreta:
+        tab1, tab2 = st.tabs(["Criar Cliente", "Adicionar Pontos"])
         
-        tab1, tab2, tab3 = st.tabs(["Lançar Pontos", "Resgatar Oferta", "Criar Cliente"])
-        
-        # ABA 1: LANÇAR PONTOS (Quando o cliente gasta €)
         with tab1:
-            st.subheader("Adicionar Pontos (Venda)")
-            clientes_list = df['Telemovel'].tolist()
-            cliente_sel = st.selectbox("Selecione o Cliente", clientes_list, format_func=lambda x: f"{x} - {df[df['Telemovel']==x]['Nome'].values[0]}")
-            
-            # Regra simples: 1 Euro = 10 Pontos (ajustável)
-            valor_gasto = st.number_input("Valor da conta (€):", min_value=0.0, step=0.5)
-            pontos_a_somar = int(valor_gasto * 10)
-            
-            if st.button("Lançar Pontos"):
-                idx = df[df['Telemovel'] == cliente_sel].index[0]
-                df.at[idx, 'Pontos'] += pontos_a_somar
-                df = log_transaction(df, cliente_sel, "Compra Loja/GloriaFood", f"+{pontos_a_somar}")
-                save_data(df)
-                st.success(f"Adicionados {pontos_a_somar} pontos ao cliente!")
-
-        # ABA 2: RESGATAR (Quando o cliente troca pontos por comida)
-        with tab2:
-            st.subheader("Abater Pontos (Oferta)")
-            cliente_redem = st.selectbox("Cliente a resgatar", clientes_list, key="redeem")
-            
-            # Mostra saldo atual
-            if cliente_redem:
-                saldo_atual = df[df['Telemovel'] == cliente_redem]['Pontos'].values[0]
-                st.write(f"Saldo atual: **{saldo_atual}** pts")
-            
-            premio_escolhido = st.selectbox("Prémio a oferecer", list(PREMIOS.keys()))
-            custo_premio = PREMIOS[premio_escolhido]
-            
-            if st.button("Confirmar Troca"):
-                if saldo_atual >= custo_premio:
-                    idx = df[df['Telemovel'] == cliente_redem].index[0]
-                    df.at[idx, 'Pontos'] -= custo_premio
-                    df = log_transaction(df, cliente_redem, f"Resgate: {premio_escolhido}", f"-{custo_premio}")
-                    save_data(df)
-                    st.balloons()
-                    st.success("Oferta redimida com sucesso!")
-                else:
-                    st.error("Saldo insuficiente!")
-
-        # ABA 3: CRIAR NOVO CLIENTE
-        with tab3:
-            st.subheader("Novo Registo")
-            novo_nome = st.text_input("Nome do Cliente")
+            st.subheader("Novo Cliente")
+            novo_nome = st.text_input("Nome")
             novo_tel = st.text_input("Telemóvel", max_chars=9)
-            
-            if st.button("Registar Cliente"):
+            if st.button("Registar"):
                 if novo_tel and novo_nome:
-                    if int(novo_tel) in df['Telemovel'].values:
-                        st.warning("Este número já existe!")
+                    # Verifica duplicados
+                    if not df.empty and int(novo_tel) in df['Telemovel'].values:
+                        st.warning("Já existe!")
                     else:
-                        novo_cliente = pd.DataFrame({"Telemovel": [int(novo_tel)], "Nome": [novo_nome], "Pontos": [0], "Historico": [""]})
-                        df = pd.concat([df, novo_cliente], ignore_index=True)
-                        save_data(df)
-                        st.success("Cliente criado!")
-                else:
-                    st.warning("Preencha todos os dados.")
+                        novo_cliente = pd.DataFrame([{
+                            "Telemovel": int(novo_tel), 
+                            "Nome": novo_nome, 
+                            "Pontos": 0, 
+                            "Historico": ""
+                        }])
+                        # Junta o novo cliente à tabela existente
+                        df_final = pd.concat([df, novo_cliente], ignore_index=True)
+                        save_data(df_final)
+                        st.success("Gravado! Verifica o Google Sheets.")
+                        st.rerun() # Atualiza a página
         
-        st.divider()
-        st.write("📊 **Lista Geral de Clientes**")
-        st.dataframe(df)
-        
-    else:
-        st.warning("Insira a password de administrador.")
+        with tab2:
+            st.write("Lista Atual:")
+            st.dataframe(df)
