@@ -6,7 +6,7 @@ from streamlit_gsheets import GSheetsConnection
 import streamlit.components.v1 as components
 
 # --- CONFIGURAÇÃO DA PÁGINA ---
-st.set_page_config(page_title="Programa de Pontos Kão Kente", page_icon="🌭", layout="wide")
+st.set_page_config(page_title="Kão Kente", page_icon="logo.png", layout="wide")
 
 # --- LIGAÇÃO AO GOOGLE SHEETS ---
 conn = st.connection("gsheets", type=GSheetsConnection)
