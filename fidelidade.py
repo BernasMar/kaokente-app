@@ -6,25 +6,23 @@ from streamlit_gsheets import GSheetsConnection
 import streamlit.components.v1 as components
 
 # --- CONFIGURAÇÃO DA PÁGINA ---
-st.set_page_config(page_title="Kão Kente", page_icon="logo.png", layout="wide")
+st.set_page_config(page_title="Kão Kente - App Oficial", page_icon="logo.png", layout="wide")
 
 # --- LIGAÇÃO AO GOOGLE SHEETS ---
 conn = st.connection("gsheets", type=GSheetsConnection)
 
-# --- DEFINIÇÃO DE PRÉMIOS E PREÇOS ---
-PREMIOS_PRECO = {
-    "Bebida de Cápsula": 0.80,
-    "Dose de Batatas Fritas": 1.50,
-    "Kebab em Pão": 4.50,
-    "Menu Hambúrguer Completo": 6.50,
-    "Francesinha Especial": 9.50
+# --- NOVA LISTA DE PRÉMIOS (PONTOS FIXOS) ---
+# Agora mapeamos o Nome do Prémio -> Custo em Pontos diretamente
+PREMIOS_PONTOS = {
+    "Dose batatas": 300,
+    "Cachorro 3K": 450,
+    "Hambúrguer Kão Kente": 500,
+    "Kebab de frango": 550,
+    "Baconcheeseburger com ovo": 700,
+    "Bitoque de frango": 950
 }
 
 # --- FUNÇÕES DE LÓGICA ---
-def calcular_custo_pontos(preco_euro):
-    # Arredonda o preço para o euro acima e multiplica por 100
-    return math.ceil(preco_euro) * 100
-
 def calcular_pontos_ganhos(valor_gasto, tipo_cliente):
     # Ignora cêntimos (usa apenas parte inteira)
     valor_inteiro = int(valor_gasto)
@@ -73,7 +71,7 @@ with st.sidebar:
         "🔐 Área de Gestão"
     ])
 
-# Carregar dados (necessário em quase todas as páginas)
+# Carregar dados
 df = load_data()
 
 # =========================================================
@@ -129,10 +127,9 @@ if pagina_selecionada == "🏆 Programa de Pontos":
 
             st.markdown("### 🎁 Prémios Disponíveis")
             col_grid1, col_grid2 = st.columns(2)
-            items_list = list(PREMIOS_PRECO.items())
+            items_list = list(PREMIOS_PONTOS.items())
             
-            for i, (premio, preco_eur) in enumerate(items_list):
-                custo_pts = calcular_custo_pontos(preco_eur)
+            for i, (premio, custo_pts) in enumerate(items_list):
                 saldo = user['Pontos']
                 percentagem = min(saldo / custo_pts, 1.0)
                 pode_comprar = saldo >= custo_pts
@@ -141,7 +138,7 @@ if pagina_selecionada == "🏆 Programa de Pontos":
                 with col_atual:
                     with st.container(border=True):
                         st.markdown(f"**{premio}**")
-                        st.caption(f"Valor: {preco_eur:.2f}€ | Custo: {custo_pts} pts")
+                        st.caption(f"Custo: {custo_pts} pts")
                         st.progress(percentagem)
                         if pode_comprar:
                             st.write("✅ **Podes pedir!**")
@@ -186,7 +183,7 @@ elif pagina_selecionada == "🔐 Área de Gestão":
     if senha_input == st.secrets.get("admin_password", "kaokente123"):
         st.divider()
         
-        # FILTRO DE PESQUISA (COMO PEDISTE)
+        # FILTRO DE PESQUISA
         col_search, col_info = st.columns([2, 1])
         with col_search:
             filtro_nome = st.text_input("🔍 Pesquisar Cliente (Nome ou Telemóvel):")
@@ -221,7 +218,7 @@ elif pagina_selecionada == "🔐 Área de Gestão":
         st.markdown("---")
 
         # ABAS DE AÇÃO
-        tab_lanc, tab_resg, tab_cri, tab_bd = st.tabs(["💰 Lançar Venda", "🎁 Resgatar Oferta", "🆕 Criar Cliente", "📊 Ver Tudo"])
+        tab_lanc, tab_resg, tab_cri, tab_edit, tab_bd = st.tabs(["💰 Lançar", "🎁 Resgatar", "🆕 Criar", "✏️ Editar/Apagar", "📊 Ver Tudo"])
 
         with tab_lanc:
             if sel_cliente:
@@ -240,12 +237,13 @@ elif pagina_selecionada == "🔐 Área de Gestão":
                     save_data(df)
                     st.success("Pontos adicionados!")
             else:
-                st.info("Selecione um cliente acima para lançar pontos.")
+                st.info("Selecione um cliente.")
 
         with tab_resg:
             if sel_cliente:
-                premio = st.selectbox("Escolher Oferta", list(PREMIOS_PRECO.keys()))
-                custo = calcular_custo_pontos(PREMIOS_PRECO[premio])
+                # Agora usa a lista de pontos fixos
+                premio = st.selectbox("Escolher Oferta", list(PREMIOS_PONTOS.keys()))
+                custo = PREMIOS_PONTOS[premio]
                 st.write(f"Custo: **{custo}** pts")
                 
                 if st.button("Confirmar Resgate"):
@@ -262,7 +260,7 @@ elif pagina_selecionada == "🔐 Área de Gestão":
                     else:
                         st.error("Saldo insuficiente.")
             else:
-                st.info("Selecione um cliente acima para resgatar.")
+                st.info("Selecione um cliente.")
 
         with tab_cri:
             st.write("Novo Registo")
@@ -285,6 +283,48 @@ elif pagina_selecionada == "🔐 Área de Gestão":
                         st.success("Cliente criado!")
                 else:
                     st.warning("Preencha todos os campos.")
+        
+        # --- NOVA ABA: EDITAR DADOS ---
+        with tab_edit:
+            if sel_cliente:
+                st.subheader(f"Editar dados de {dados_cli['Nome']}")
+                
+                with st.form("form_edicao"):
+                    edit_nome = st.text_input("Nome", value=dados_cli['Nome'])
+                    
+                    # Indice do tipo atual
+                    idx_tipo = 0 if dados_cli['Tipo'] == "Normal" else 1
+                    edit_tipo = st.selectbox("Tipo", ["Normal", "Estudante"], index=idx_tipo)
+                    
+                    edit_pass = st.text_input("Password", value=dados_cli['Password'])
+                    edit_pontos = st.number_input("Correção Manual de Pontos", value=int(dados_cli['Pontos']), step=1)
+                    
+                    col_save, col_del = st.columns([1, 4])
+                    
+                    with col_save:
+                        submit_edit = st.form_submit_button("💾 Guardar Alterações")
+                    
+                    if submit_edit:
+                        idx = df[df['Telemovel'] == sel_cliente].index[0]
+                        df.at[idx, 'Nome'] = edit_nome
+                        df.at[idx, 'Tipo'] = edit_tipo
+                        df.at[idx, 'Password'] = edit_pass
+                        df.at[idx, 'Pontos'] = edit_pontos
+                        save_data(df)
+                        st.success("Dados atualizados com sucesso! (Recarregue para ver)")
+                
+                st.divider()
+                st.write("🛑 **Zona de Perigo**")
+                with st.expander("Apagar Cliente"):
+                    st.warning(f"Tem a certeza que quer apagar o cliente {dados_cli['Nome']}? Esta ação é irreversível.")
+                    if st.button("Sim, APAGAR Cliente permanentemente"):
+                        idx = df[df['Telemovel'] == sel_cliente].index[0]
+                        df = df.drop(idx)
+                        save_data(df)
+                        st.error("Cliente apagado.")
+                        st.rerun()
+            else:
+                st.info("Selecione um cliente para editar.")
 
         with tab_bd:
             st.dataframe(df)
