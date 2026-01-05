@@ -12,7 +12,6 @@ st.set_page_config(page_title="Kão Kente - App Oficial", page_icon="logo.png", 
 conn = st.connection("gsheets", type=GSheetsConnection)
 
 # --- NOVA LISTA DE PRÉMIOS (PONTOS FIXOS) ---
-# Agora mapeamos o Nome do Prémio -> Custo em Pontos diretamente
 PREMIOS_PONTOS = {
     "Dose batatas": 300,
     "Cachorro 3K": 450,
@@ -24,10 +23,66 @@ PREMIOS_PONTOS = {
 
 # --- FUNÇÕES DE LÓGICA ---
 def calcular_pontos_ganhos(valor_gasto, tipo_cliente):
-    # Ignora cêntimos (usa apenas parte inteira)
     valor_inteiro = int(valor_gasto)
     multiplicador = 7.5 if tipo_cliente == "Estudante" else 5.0
     return int(valor_inteiro * multiplicador)
+
+def calcular_metricas_mensais(historico_str):
+    """
+    Analisa o histórico e calcula quanto o cliente gastou (em €) 
+    no mês atual e no mês anterior.
+    """
+    agora = datetime.now()
+    mes_atual = agora.month
+    ano_atual = agora.year
+    
+    # Calcular qual é o mês anterior
+    if mes_atual == 1:
+        mes_anterior = 12
+        ano_anterior = ano_atual - 1
+    else:
+        mes_anterior = mes_atual - 1
+        ano_anterior = ano_atual
+
+    total_atual = 0.0
+    total_anterior = 0.0
+
+    if not isinstance(historico_str, str):
+        return 0.0, 0.0
+
+    # Analisa linha a linha
+    linhas = historico_str.split('\n')
+    for linha in linhas:
+        if "Compra" in linha:
+            try:
+                # Formato esperado: "dd/mm/aaaa HH:MM | Compra 15.5€ | ..."
+                # Separar data e descrição
+                partes = linha.split('|')
+                data_str = partes[0].strip()
+                desc_str = partes[1].strip() # Ex: "Compra 15.0€"
+                
+                # Extrair valor monetário
+                valor_str = desc_str.replace("Compra", "").replace("€", "").strip()
+                valor = float(valor_str)
+                
+                # Tentar ler a data.
+                # Nota: Logs antigos podem não ter o ano, assumimos ano atual se falhar.
+                try:
+                    dt = datetime.strptime(data_str, '%d/%m/%Y %H:%M')
+                except ValueError:
+                    # Fallback para logs antigos (sem ano)
+                    dt_temp = datetime.strptime(data_str, '%d/%m %H:%M')
+                    dt = dt_temp.replace(year=ano_atual)
+
+                # Soma aos baldes corretos
+                if dt.month == mes_atual and dt.year == ano_atual:
+                    total_atual += valor
+                elif dt.month == mes_anterior and dt.year == ano_anterior:
+                    total_anterior += valor
+            except:
+                continue # Ignora linhas mal formatadas
+                
+    return total_atual, total_anterior
 
 def load_data():
     try:
@@ -56,7 +111,6 @@ def save_data(df):
 
 # --- BARRA LATERAL (MENU) ---
 with st.sidebar:
-    # Logo
     try:
         st.image("logo.png", use_container_width=True)
     except:
@@ -64,14 +118,12 @@ with st.sidebar:
 
     st.divider()
     
-    # MENU DE NAVEGAÇÃO COM 3 OPÇÕES
     pagina_selecionada = st.radio("Navegação", [
         "🏆 Programa de Pontos", 
         "🛵 Encomendar Online", 
         "🔐 Área de Gestão"
     ])
 
-# Carregar dados
 df = load_data()
 
 # =========================================================
@@ -86,7 +138,6 @@ if pagina_selecionada == "🏆 Programa de Pontos":
     tab_cliente, tab_sobre = st.tabs(["👤 A minha Conta", "ℹ️ Sobre o Programa"])
 
     with tab_cliente:
-        # LOGIN
         if st.session_state['user_logado'] is None:
             st.info("Faz login para veres o teu saldo e ofertas.")
             col1, col2 = st.columns(2)
@@ -107,10 +158,8 @@ if pagina_selecionada == "🏆 Programa de Pontos":
                 else:
                     st.error("Número inválido.")
 
-        # ÁREA PESSOAL (LOGADO)
         else:
             user = st.session_state['user_logado']
-            # Garante dados frescos
             user_atualizado = df[df['Telemovel'] == user['Telemovel']]
             if not user_atualizado.empty:
                 user = user_atualizado.iloc[0]
@@ -177,18 +226,15 @@ elif pagina_selecionada == "🛵 Encomendar Online":
 elif pagina_selecionada == "🔐 Área de Gestão":
     st.title("🔐 Gestão Kão Kente")
     
-    # Password check
     senha_input = st.text_input("Insira a Password de Admin", type="password")
     
     if senha_input == st.secrets.get("admin_password", "kaokente123"):
         st.divider()
         
-        # FILTRO DE PESQUISA
         col_search, col_info = st.columns([2, 1])
         with col_search:
             filtro_nome = st.text_input("🔍 Pesquisar Cliente (Nome ou Telemóvel):")
         
-        # Lógica de filtro
         lista_completa = df.to_dict('records')
         opcoes_filtradas = []
         if filtro_nome:
@@ -202,22 +248,30 @@ elif pagina_selecionada == "🔐 Área de Gestão":
 
         sel_cliente = None
         if opcoes_filtradas:
-            sel_cliente = st.selectbox("Selecionar Cliente da Lista:", opcoes_filtradas, 
+            sel_cliente = st.selectbox("Selecionar Cliente:", opcoes_filtradas, 
                                      format_func=lambda x: f"{df[df['Telemovel']==x]['Nome'].values[0]} ({x})")
         else:
             st.warning("Nenhum cliente encontrado.")
 
-        # MOSTRAR DADOS DO CLIENTE SELECIONADO
+        # MOSTRAR DADOS E MÉTRICAS MENSAIS
         if sel_cliente:
             dados_cli = df[df['Telemovel'] == sel_cliente].iloc[0]
+            
+            # Calcula gastos
+            gasto_atual, gasto_anterior = calcular_metricas_mensais(dados_cli['Historico'])
+            
             with col_info:
                 st.success(f"**{dados_cli['Nome']}**")
-                st.metric("Saldo Atual", f"{dados_cli['Pontos']} pts")
                 st.caption(f"Tipo: {dados_cli['Tipo']}")
+                
+                # Visualização de Saldos e Métricas
+                m1, m2, m3 = st.columns(3)
+                m1.metric("Saldo Pontos", f"{dados_cli['Pontos']}")
+                m2.metric("Gasto Mês Atual", f"{gasto_atual:.1f}€")
+                m3.metric("Gasto Mês Anterior", f"{gasto_anterior:.1f}€")
 
         st.markdown("---")
 
-        # ABAS DE AÇÃO
         tab_lanc, tab_resg, tab_cri, tab_edit, tab_bd = st.tabs(["💰 Lançar", "🎁 Resgatar", "🆕 Criar", "✏️ Editar/Apagar", "📊 Ver Tudo"])
 
         with tab_lanc:
@@ -231,7 +285,8 @@ elif pagina_selecionada == "🔐 Área de Gestão":
                     idx = df[df['Telemovel'] == sel_cliente].index[0]
                     df.at[idx, 'Pontos'] += pts_ganhar
                     
-                    log = f"{datetime.now().strftime('%d/%m %H:%M')} | Compra {val_eur}€ | +{pts_ganhar} pts\n"
+                    # LOG AGORA INCLUI O ANO (%Y) para permitir cálculos futuros corretos
+                    log = f"{datetime.now().strftime('%d/%m/%Y %H:%M')} | Compra {val_eur}€ | +{pts_ganhar} pts\n"
                     df.at[idx, 'Historico'] = log + str(df.at[idx, 'Historico'])
                     
                     save_data(df)
@@ -241,7 +296,6 @@ elif pagina_selecionada == "🔐 Área de Gestão":
 
         with tab_resg:
             if sel_cliente:
-                # Agora usa a lista de pontos fixos
                 premio = st.selectbox("Escolher Oferta", list(PREMIOS_PONTOS.keys()))
                 custo = PREMIOS_PONTOS[premio]
                 st.write(f"Custo: **{custo}** pts")
@@ -251,7 +305,7 @@ elif pagina_selecionada == "🔐 Área de Gestão":
                         idx = df[df['Telemovel'] == sel_cliente].index[0]
                         df.at[idx, 'Pontos'] -= custo
                         
-                        log = f"{datetime.now().strftime('%d/%m %H:%M')} | Resgate {premio} | -{custo} pts\n"
+                        log = f"{datetime.now().strftime('%d/%m/%Y %H:%M')} | Resgate {premio} | -{custo} pts\n"
                         df.at[idx, 'Historico'] = log + str(df.at[idx, 'Historico'])
                         
                         save_data(df)
@@ -284,25 +338,19 @@ elif pagina_selecionada == "🔐 Área de Gestão":
                 else:
                     st.warning("Preencha todos os campos.")
         
-        # --- NOVA ABA: EDITAR DADOS ---
         with tab_edit:
             if sel_cliente:
                 st.subheader(f"Editar dados de {dados_cli['Nome']}")
-                
                 with st.form("form_edicao"):
                     edit_nome = st.text_input("Nome", value=dados_cli['Nome'])
-                    
-                    # Indice do tipo atual
                     idx_tipo = 0 if dados_cli['Tipo'] == "Normal" else 1
                     edit_tipo = st.selectbox("Tipo", ["Normal", "Estudante"], index=idx_tipo)
-                    
                     edit_pass = st.text_input("Password", value=dados_cli['Password'])
                     edit_pontos = st.number_input("Correção Manual de Pontos", value=int(dados_cli['Pontos']), step=1)
                     
                     col_save, col_del = st.columns([1, 4])
-                    
                     with col_save:
-                        submit_edit = st.form_submit_button("💾 Guardar Alterações")
+                        submit_edit = st.form_submit_button("💾 Guardar")
                     
                     if submit_edit:
                         idx = df[df['Telemovel'] == sel_cliente].index[0]
@@ -311,20 +359,19 @@ elif pagina_selecionada == "🔐 Área de Gestão":
                         df.at[idx, 'Password'] = edit_pass
                         df.at[idx, 'Pontos'] = edit_pontos
                         save_data(df)
-                        st.success("Dados atualizados com sucesso! (Recarregue para ver)")
+                        st.success("Dados atualizados!")
                 
                 st.divider()
-                st.write("🛑 **Zona de Perigo**")
                 with st.expander("Apagar Cliente"):
-                    st.warning(f"Tem a certeza que quer apagar o cliente {dados_cli['Nome']}? Esta ação é irreversível.")
-                    if st.button("Sim, APAGAR Cliente permanentemente"):
+                    st.warning("Ação irreversível.")
+                    if st.button("Sim, APAGAR Cliente"):
                         idx = df[df['Telemovel'] == sel_cliente].index[0]
                         df = df.drop(idx)
                         save_data(df)
-                        st.error("Cliente apagado.")
+                        st.error("Apagado.")
                         st.rerun()
             else:
-                st.info("Selecione um cliente para editar.")
+                st.info("Selecione um cliente.")
 
         with tab_bd:
             st.dataframe(df)
