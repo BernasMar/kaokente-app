@@ -21,6 +21,32 @@ PREMIOS_PONTOS = {
     "Bitoque de frango": 950
 }
 
+# --- URL DE ENCOMENDAS ---
+URL_ENCOMENDAS = "https://www.foodbooking.com/ordering/restaurant/menu?company_uid=e92e9690-8f0b-45e2-acca-6671a872abb9&restaurant_uid=5e09158f-4dc1-4b17-b9d5-687ca8510db8&facebook=true"
+
+# --- FUNÇÃO PARA CRIAR BOTÃO LARANJA PERSONALIZADO ---
+def botao_laranja(texto, link):
+    st.markdown(f"""
+    <a href="{link}" target="_blank">
+        <div style="
+            background-color: #F58C21;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 20px;
+            text-decoration: none;
+            display: inline-block;
+            width: 100%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        ">
+            {texto} ↗
+        </div>
+    </a>
+    """, unsafe_allow_html=True)
+
 # --- FUNÇÕES DE LÓGICA ---
 def calcular_pontos_ganhos(valor_gasto, tipo_cliente):
     valor_inteiro = int(valor_gasto)
@@ -28,15 +54,10 @@ def calcular_pontos_ganhos(valor_gasto, tipo_cliente):
     return int(valor_inteiro * multiplicador)
 
 def calcular_metricas_mensais(historico_str):
-    """
-    Analisa o histórico e calcula quanto o cliente gastou (em €) 
-    no mês atual e no mês anterior.
-    """
     agora = datetime.now()
     mes_atual = agora.month
     ano_atual = agora.year
     
-    # Calcular qual é o mês anterior
     if mes_atual == 1:
         mes_anterior = 12
         ano_anterior = ano_atual - 1
@@ -50,37 +71,29 @@ def calcular_metricas_mensais(historico_str):
     if not isinstance(historico_str, str):
         return 0.0, 0.0
 
-    # Analisa linha a linha
     linhas = historico_str.split('\n')
     for linha in linhas:
         if "Compra" in linha:
             try:
-                # Formato esperado: "dd/mm/aaaa HH:MM | Compra 15.5€ | ..."
-                # Separar data e descrição
                 partes = linha.split('|')
                 data_str = partes[0].strip()
-                desc_str = partes[1].strip() # Ex: "Compra 15.0€"
+                desc_str = partes[1].strip()
                 
-                # Extrair valor monetário
                 valor_str = desc_str.replace("Compra", "").replace("€", "").strip()
                 valor = float(valor_str)
                 
-                # Tentar ler a data.
-                # Nota: Logs antigos podem não ter o ano, assumimos ano atual se falhar.
                 try:
                     dt = datetime.strptime(data_str, '%d/%m/%Y %H:%M')
                 except ValueError:
-                    # Fallback para logs antigos (sem ano)
                     dt_temp = datetime.strptime(data_str, '%d/%m %H:%M')
                     dt = dt_temp.replace(year=ano_atual)
 
-                # Soma aos baldes corretos
                 if dt.month == mes_atual and dt.year == ano_atual:
                     total_atual += valor
                 elif dt.month == mes_anterior and dt.year == ano_anterior:
                     total_anterior += valor
             except:
-                continue # Ignora linhas mal formatadas
+                continue
                 
     return total_atual, total_anterior
 
@@ -131,6 +144,11 @@ df = load_data()
 # =========================================================
 if pagina_selecionada == "🏆 Programa de Pontos":
     st.title("🌭 Programa de Pontos Kão Kente")
+
+    # BOTÃO EM DESTAQUE PARA ENCOMENDAR (NOVO)
+    st.write("") # Espaçamento
+    botao_laranja("🛵 Encomendar Online Agora!", URL_ENCOMENDAS)
+    st.write("") # Espaçamento
 
     if 'user_logado' not in st.session_state:
         st.session_state['user_logado'] = None
@@ -210,15 +228,16 @@ if pagina_selecionada == "🏆 Programa de Pontos":
 # =========================================================
 elif pagina_selecionada == "🛵 Encomendar Online":
     st.title("🛵 Encomendar Online")
-    gloria_url = "https://www.foodbooking.com/ordering/restaurant/menu?company_uid=e92e9690-8f0b-45e2-acca-6671a872abb9&restaurant_uid=5e09158f-4dc1-4b17-b9d5-687ca8510db8&facebook=true"
     
     st.info("Faz o teu pedido aqui em baixo:")
+    
+    # BOTÃO MOVIDO PARA CIMA E COM A COR LARANJA
+    botao_laranja("Abrir Ementa em Nova Janela", URL_ENCOMENDAS)
+    
     try:
-        components.iframe(gloria_url, height=800, scrolling=True)
+        components.iframe(URL_ENCOMENDAS, height=800, scrolling=True)
     except:
         st.error("Erro ao carregar menu.")
-    
-    st.link_button("Abrir Menu em Nova Janela ↗️", gloria_url, type="primary")
 
 # =========================================================
 # PÁGINA 3: ÁREA DE GESTÃO (ADMIN)
@@ -256,15 +275,11 @@ elif pagina_selecionada == "🔐 Área de Gestão":
         # MOSTRAR DADOS E MÉTRICAS MENSAIS
         if sel_cliente:
             dados_cli = df[df['Telemovel'] == sel_cliente].iloc[0]
-            
-            # Calcula gastos
             gasto_atual, gasto_anterior = calcular_metricas_mensais(dados_cli['Historico'])
             
             with col_info:
                 st.success(f"**{dados_cli['Nome']}**")
                 st.caption(f"Tipo: {dados_cli['Tipo']}")
-                
-                # Visualização de Saldos e Métricas
                 m1, m2, m3 = st.columns(3)
                 m1.metric("Saldo Pontos", f"{dados_cli['Pontos']}")
                 m2.metric("Gasto Mês Atual", f"{gasto_atual:.1f}€")
@@ -278,17 +293,13 @@ elif pagina_selecionada == "🔐 Área de Gestão":
             if sel_cliente:
                 val_eur = st.number_input("Valor da Venda (€)", min_value=0.0, step=0.5)
                 pts_ganhar = calcular_pontos_ganhos(val_eur, dados_cli['Tipo'])
-                
                 st.write(f"Vai ganhar: **{pts_ganhar}** pontos (Base: {int(val_eur)}€)")
                 
                 if st.button("Confirmar Lançamento"):
                     idx = df[df['Telemovel'] == sel_cliente].index[0]
                     df.at[idx, 'Pontos'] += pts_ganhar
-                    
-                    # LOG AGORA INCLUI O ANO (%Y) para permitir cálculos futuros corretos
                     log = f"{datetime.now().strftime('%d/%m/%Y %H:%M')} | Compra {val_eur}€ | +{pts_ganhar} pts\n"
                     df.at[idx, 'Historico'] = log + str(df.at[idx, 'Historico'])
-                    
                     save_data(df)
                     st.success("Pontos adicionados!")
             else:
@@ -299,15 +310,12 @@ elif pagina_selecionada == "🔐 Área de Gestão":
                 premio = st.selectbox("Escolher Oferta", list(PREMIOS_PONTOS.keys()))
                 custo = PREMIOS_PONTOS[premio]
                 st.write(f"Custo: **{custo}** pts")
-                
                 if st.button("Confirmar Resgate"):
                     if dados_cli['Pontos'] >= custo:
                         idx = df[df['Telemovel'] == sel_cliente].index[0]
                         df.at[idx, 'Pontos'] -= custo
-                        
                         log = f"{datetime.now().strftime('%d/%m/%Y %H:%M')} | Resgate {premio} | -{custo} pts\n"
                         df.at[idx, 'Historico'] = log + str(df.at[idx, 'Historico'])
-                        
                         save_data(df)
                         st.balloons()
                         st.success("Oferta entregue!")
@@ -322,7 +330,6 @@ elif pagina_selecionada == "🔐 Área de Gestão":
             n_tel = st.text_input("Telemóvel")
             n_pass = st.text_input("Password Inicial")
             n_tipo = st.selectbox("Tipo", ["Normal", "Estudante"])
-            
             if st.button("Criar Ficha"):
                 if n_tel and n_nome and n_pass:
                     if n_tel.isdigit() and int(n_tel) in df['Telemovel'].values:
