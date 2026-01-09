@@ -34,7 +34,7 @@ def get_image_base64(path):
 
 logo_b64 = get_image_base64("logo.png")
 
-# --- CSS (CORREÇÕES VISUAIS) ---
+# --- CSS (CORREÇÕES VISUAIS DE FUNDO E SELECTBOX) ---
 st.markdown(f"""
     <style>
     .block-container {{
@@ -99,7 +99,7 @@ st.markdown(f"""
         padding: 0 15px !important;
     }}
 
-    /* INPUTS DE TEXTO */
+    /* INPUTS DE TEXTO GERAIS */
     .stTextInput > div > div > input, 
     .stNumberInput > div > div > input,
     .stDateInput > div > div > input {{
@@ -110,22 +110,41 @@ st.markdown(f"""
         text-align: left !important;
     }}
     
-    /* --- CORREÇÃO SELECTBOX (DROP DOWN) --- */
-    /* Garante que o fundo é branco e o texto/seta são castanhos */
+    /* --- CORREÇÃO CRÍTICA PARA SELECTBOX (MENUS DE OPÇÕES) --- */
+    
+    /* 1. A caixa principal do Selectbox (antes de clicar) */
     .stSelectbox div[data-baseweb="select"] > div {{
         background-color: white !important;
         border-color: white !important;
         color: {COR_CASTANHO} !important;
     }}
     
-    /* Texto da opção selecionada */
+    /* 2. O texto dentro da caixa principal */
     .stSelectbox div[data-baseweb="select"] span {{
         color: {COR_CASTANHO} !important;
     }}
     
-    /* Ícone da seta */
+    /* 3. A setinha (ícone SVG) */
     .stSelectbox div[data-baseweb="select"] svg {{
         fill: {COR_CASTANHO} !important;
+        color: {COR_CASTANHO} !important;
+    }}
+    
+    /* 4. O MENU DROPDOWN (A lista que abre) */
+    ul[data-baseweb="menu"] {{
+        background-color: white !important;
+    }}
+    
+    /* 5. As opções dentro da lista */
+    li[data-baseweb="option"] {{
+        color: {COR_CASTANHO} !important; /* Texto castanho */
+        background-color: white !important; /* Fundo branco */
+    }}
+    
+    /* 6. Opção selecionada ou hover */
+    li[data-baseweb="option"]:hover, li[data-baseweb="option"][aria-selected="true"] {{
+        background-color: #fce8d4 !important; /* Fundo laranja claro */
+        color: {COR_CASTANHO} !important;
     }}
     
     /* Ícones genéricos dentro de inputs */
