@@ -18,9 +18,9 @@ COR_VERDE_CLARO = "#8db842"
 COR_VERDE_ESCURO = "#0d974d"
 COR_BRANCO = "#ffffff"
 
-# --- ACESSO DIRETO VIA URL ---
-# Se o link tiver ?menu=staff, vai direto para o admin
-if "menu" in st.query_params and st.query_params["menu"] == "staff":
+# --- ACESSO DIRETO VIA URL (LINK DEDICADO) ---
+# Link: kaokente.streamlit.app/?menu=gest
+if "menu" in st.query_params and st.query_params["menu"] == "gest":
     if st.session_state.get('pagina') != 'admin_panel':
         st.session_state['pagina'] = 'admin_login'
 
@@ -35,7 +35,7 @@ def get_image_base64(path):
 
 logo_b64 = get_image_base64("logo.png")
 
-# --- CSS PERSONALIZADO ---
+# --- CSS PERSONALIZADO (VISUAL FINAL) ---
 st.markdown(f"""
     <style>
     /* Ajuste do topo */
@@ -60,28 +60,49 @@ st.markdown(f"""
         font-family: sans-serif;
     }}
 
-    /* BOTÕES STREAMLIT (Laranja) - FORÇAR LARGURA TOTAL E ESTILO */
+    /* === BOTÕES STREAMLIT IGUAIS AO HTML VERDE === */
     .stButton {{
         width: 100%;
+        margin-top: 5px;
+        margin-bottom: 5px;
     }}
     
     .stButton > button {{
         width: 100% !important;
         display: block !important;
-        border-radius: 12px !important;
+        
+        /* Dimensões Exatas do Botão Verde */
         height: 3.8em !important;
+        line-height: 1.5em !important; 
+        border-radius: 12px !important;
+        
+        /* Cores */
         background-color: {COR_BOTAO_FUNDO} !important;
-        color: {COR_BOTAO_TEXTO} !important; /* Texto Azul Claro */
-        border: 2px solid {COR_BOTAO_TEXTO} !important; /* Borda Azul Clara */
+        color: {COR_BOTAO_TEXTO} !important;
+        border: 2px solid {COR_BOTAO_TEXTO} !important;
+        
+        /* Fonte */
         font-weight: 800 !important;
         font-size: 1.1em !important;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.2) !important;
         text-transform: uppercase !important;
-        margin: 5px 0 !important;
+        
+        /* Sombra */
+        box-shadow: 0 4px 6px rgba(0,0,0,0.2) !important;
+        
+        margin: 0 !important;
     }}
     
     .stButton > button:active {{ transform: translateY(2px); }}
     
+    /* Botões de Navegação (Voltar/Home) - Mais pequenos */
+    .nav-btn > button {{
+        height: 2.5em !important;
+        font-size: 0.9em !important;
+        background-color: white !important;
+        color: {COR_FUNDO} !important;
+        border: none !important;
+    }}
+
     /* INPUTS (Caixas de Texto) - Brancas com texto Castanho */
     .stTextInput > div > div > input, 
     .stNumberInput > div > div > input {{
@@ -93,7 +114,6 @@ st.markdown(f"""
         font-weight: normal !important;
     }}
     
-    /* Correção cores ícones input */
     button[kind="secondary"] {{ color: {COR_CASTANHO} !important; }}
     
     /* Selectbox */
@@ -104,6 +124,19 @@ st.markdown(f"""
     }}
     .stSelectbox div[data-baseweb="select"] span {{ color: {COR_CASTANHO} !important; }}
     .stSelectbox svg {{ fill: {COR_CASTANHO} !important; }}
+
+    /* EASTER EGG BUTTON */
+    .easter-egg > button {{
+        background-color: #fff3cd !important;
+        color: #856404 !important;
+        border: 1px solid #ffeeba !important;
+        font-weight: normal !important;
+        font-size: 0.9em !important;
+        height: auto !important;
+        padding: 15px !important;
+        text-transform: none !important;
+        white-space: normal !important;
+    }}
 
     /* CARD DE SALDO */
     .saldo-card {{
@@ -143,6 +176,8 @@ if 'pagina' not in st.session_state: st.session_state['pagina'] = "home"
 if 'user_logado' not in st.session_state: st.session_state['user_logado'] = None
 
 def navegar(destino):
+    # Limpa o ?menu=gest do URL para evitar loops
+    st.query_params.clear()
     st.session_state['pagina'] = destino
     st.rerun()
 
@@ -200,15 +235,29 @@ def save_data(df):
 
 # --- COMPONENTES VISUAIS ---
 def render_logo_centered_white_bg():
+    # Aumentei a img src width para 135 para encher mais o círculo
     st.markdown(f"""
         <div style="display: flex; justify-content: center; margin-bottom: 0px;">
             <div style="background-color: white; border-radius: 50%; padding: 5px; width: 140px; height: 140px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
                 <a href="https://kaokente.streamlit.app/" target="_self">
-                    <img src="{logo_b64}" width="125" style="border-radius: 50%;">
+                    <img src="{logo_b64}" width="135" style="border-radius: 50%;">
                 </a>
             </div>
         </div>
     """, unsafe_allow_html=True)
+
+def render_navigation():
+    # Botões de Navegação (Voltar e Home) em todas as páginas
+    # Usamos uma classe CSS 'nav-btn' para eles não ficarem gigantes como os outros
+    st.markdown('<div class="nav-btn">', unsafe_allow_html=True)
+    c1, c2, c3 = st.columns([1, 3, 1])
+    with c1:
+        if st.button("⬅ Voltar"):
+            navegar("home")
+    with c3:
+        if st.button("🏠 Início"):
+            navegar("home")
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # =========================================================
 # PÁGINA: HOME
@@ -244,7 +293,7 @@ def pagina_home(df):
 
     st.write("")
 
-    # Botão Linktree (HTML direto para match exato do verde)
+    # Botão Linktree - Agora igual aos outros em tamanho
     st.markdown(f"""
     <a href="{URL_LINKTREE}" target="_blank" style="text-decoration: none;">
         <div style="
@@ -262,7 +311,8 @@ def pagina_home(df):
             text-transform: uppercase; 
             display: block; 
             width: 100%;
-            margin-top: 5px;">
+            margin-top: 5px;
+            margin-bottom: 5px;">
             🌲 LinkTree Kão Kente
         </div>
     </a>
@@ -270,22 +320,23 @@ def pagina_home(df):
     
     if user is not None:
         st.write("")
+        st.markdown('<div class="nav-btn">', unsafe_allow_html=True)
         if st.button("Sair / Logout"):
             st.session_state['user_logado'] = None
-            st.rerun()
+            navegar("home")
+        st.markdown('</div>', unsafe_allow_html=True)
 
 # =========================================================
 # PÁGINA: ENCOMENDAS
 # =========================================================
 def pagina_encomendas():
-    if st.button("⬅ Voltar"): navegar("home")
+    render_navigation()
     
     st.markdown(f"<h2>Encomendar Online</h2>", unsafe_allow_html=True)
     
-    # EASTER EGG: Caixa de Texto que é um Link para Admin
-    # Parece um aviso, mas clica-se e vai para ?menu=staff
+    # EASTER EGG: Link para ?menu=gest
     st.markdown(f"""
-    <a href="?menu=staff" target="_self" style="text-decoration: none;">
+    <a href="?menu=gest" target="_self" style="text-decoration: none;">
         <div style="
             background-color: white;
             color: #856404;
@@ -302,7 +353,7 @@ def pagina_encomendas():
     </a>
     """, unsafe_allow_html=True)
 
-    # Botão Laranja (Link Externo - Visual consistente)
+    # Botão Laranja (Link Externo)
     st.markdown(f"""
     <div style="text-align: center; margin-top: 15px;">
         <a href="{URL_ENCOMENDAS}" target="_blank" style="text-decoration: none;">
@@ -337,8 +388,7 @@ def pagina_encomendas():
 # =========================================================
 def pagina_login_menu(df):
     render_logo_centered_white_bg()
-    
-    if st.button("⬅ Voltar"): navegar("home")
+    render_navigation()
     
     st.markdown("""<style>.stTabs [data-baseweb="tab-list"] button {color: white !important;}</style>""", unsafe_allow_html=True)
     
@@ -417,7 +467,7 @@ def pagina_login_menu(df):
 # PÁGINA: PONTOS
 # =========================================================
 def pagina_pontos(df):
-    if st.button("⬅ Voltar"): navegar("home")
+    render_navigation()
     
     user = st.session_state['user_logado']
     user = df[df['Telemovel'] == user['Telemovel']].iloc[0]
@@ -462,7 +512,7 @@ def pagina_pontos(df):
 # PÁGINA: ADMIN (STAFF)
 # =========================================================
 def pagina_admin_login():
-    if st.button("⬅ Voltar"): navegar("home")
+    render_navigation()
     st.markdown("<h2>Acesso Staff</h2>", unsafe_allow_html=True)
     pwd = st.text_input("Password", type="password")
     if pwd == st.secrets.get("admin_password", "kaokente123"):
@@ -472,9 +522,11 @@ def pagina_admin_login():
         st.error("Errado")
 
 def pagina_admin_panel(df):
+    st.markdown('<div class="nav-btn">', unsafe_allow_html=True)
     if st.button("⬅ Sair"): 
         st.session_state['admin_ok'] = False
         navegar("home")
+    st.markdown('</div>', unsafe_allow_html=True)
         
     st.title("🔐 Gestão")
     
@@ -575,7 +627,11 @@ def pagina_admin_panel(df):
                     st.rerun()
         
         with t4:
-            st.dataframe(df)
+            st.warning("Área Restrita")
+            pass_master = st.text_input("Password Mestra", type="password")
+            # Define a tua password master aqui (ex: benfica)
+            if pass_master == "noronha":
+                st.dataframe(df)
 
 # --- MAIN LOOP ---
 df = load_data()
