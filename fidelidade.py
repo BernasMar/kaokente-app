@@ -37,11 +37,10 @@ logo_b64 = get_image_base64("logo.png")
 # --- CSS (CORREÇÕES VISUAIS) ---
 st.markdown(f"""
     <style>
-    /* Contentor Principal - Centrado e Estreito para Mobile */
     .block-container {{
         padding-top: 1rem;
         padding-bottom: 5rem;
-        max-width: 600px; /* Força largura de telemóvel no PC */
+        max-width: 600px;
         margin: 0 auto;
     }}
     
@@ -49,7 +48,6 @@ st.markdown(f"""
     
     #MainMenu, header, footer {{ visibility: hidden; }}
 
-    /* TEXTOS */
     h1, h2, h3, h4 {{
         color: {COR_BRANCO} !important;
         font-weight: 800 !important;
@@ -61,8 +59,7 @@ st.markdown(f"""
         font-family: sans-serif;
     }}
 
-    /* === BOTÕES PRINCIPAIS (LARANJA) === */
-    /* Garante que o botão ocupa a largura toda do contentor pai */
+    /* BOTÕES LARANJA */
     .stButton {{
         width: 100% !important;
         padding: 0 !important;
@@ -73,7 +70,7 @@ st.markdown(f"""
     }}
     
     .stButton > button {{
-        width: 100% !important; /* Ocupa 100% da largura disponível */
+        width: 100% !important;
         display: block !important;
         height: 3.8em !important;
         background-color: {COR_BOTAO_FUNDO} !important;
@@ -88,9 +85,9 @@ st.markdown(f"""
     }}
     .stButton > button:active {{ transform: translateY(2px); }}
 
-    /* === BOTÃO DE VOLTAR (Correção Texto Apertado) === */
+    /* BOTÃO DE VOLTAR */
     .nav-btn .stButton > button {{
-        width: auto !important; /* Largura automática para o texto caber */
+        width: auto !important;
         min-width: 100px;
         height: 2.5em !important;
         font-size: 0.9em !important;
@@ -98,11 +95,11 @@ st.markdown(f"""
         color: {COR_FUNDO} !important;
         border: none !important;
         box-shadow: none !important;
-        white-space: nowrap !important; /* Impede quebra de linha */
+        white-space: nowrap !important;
         padding: 0 15px !important;
     }}
 
-    /* INPUTS */
+    /* INPUTS DE TEXTO */
     .stTextInput > div > div > input, 
     .stNumberInput > div > div > input,
     .stDateInput > div > div > input {{
@@ -113,16 +110,29 @@ st.markdown(f"""
         text-align: left !important;
     }}
     
-    /* Ícones e Selectbox */
-    button[kind="secondary"], div[data-baseweb="calendar"] button {{ color: {COR_CASTANHO} !important; }}
-    .stSelectbox > div > div {{ background-color: white !important; color: {COR_CASTANHO} !important; border-radius: 8px; }}
-    .stSelectbox div[data-baseweb="select"] span {{ color: {COR_CASTANHO} !important; }}
-    .stSelectbox svg {{ fill: {COR_CASTANHO} !important; }}
+    /* --- CORREÇÃO SELECTBOX (DROP DOWN) --- */
+    /* Garante que o fundo é branco e o texto/seta são castanhos */
+    .stSelectbox div[data-baseweb="select"] > div {{
+        background-color: white !important;
+        border-color: white !important;
+        color: {COR_CASTANHO} !important;
+    }}
     
-    /* Radio Button (Sim/Não) */
+    /* Texto da opção selecionada */
+    .stSelectbox div[data-baseweb="select"] span {{
+        color: {COR_CASTANHO} !important;
+    }}
+    
+    /* Ícone da seta */
+    .stSelectbox div[data-baseweb="select"] svg {{
+        fill: {COR_CASTANHO} !important;
+    }}
+    
+    /* Ícones genéricos dentro de inputs */
+    button[kind="secondary"], div[data-baseweb="calendar"] button {{ color: {COR_CASTANHO} !important; }}
+    
     .stRadio label {{ color: {COR_BRANCO} !important; font-weight: bold; }}
 
-    /* CARD SALDO */
     .saldo-card {{
         background-color: white;
         border-radius: 20px;
@@ -133,7 +143,6 @@ st.markdown(f"""
         box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     }}
     
-    /* Centralizar Imagens */
     div[data-testid="stImage"] {{
         display: flex;
         justify-content: center;
@@ -220,7 +229,6 @@ def save_data(df):
 
 # --- COMPONENTES VISUAIS ---
 def render_logo_big():
-    # Logo Grande (160px)
     st.markdown(f"""
         <div style="display: flex; justify-content: center; margin-bottom: 10px;">
             <div style="background-color: white; border-radius: 50%; padding: 5px; width: 165px; height: 165px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
@@ -232,27 +240,10 @@ def render_logo_big():
     """, unsafe_allow_html=True)
 
 def render_navigation(show_logo=True):
-    # Botão Voltar (Esq) e Logo Pequeno (Dir)
-    # Usamos classes específicas para alinhamento
+    # APENAS BOTÃO VOLTAR (Sem logo pequeno)
     st.markdown('<div class="nav-btn">', unsafe_allow_html=True)
-    c1, c2 = st.columns([1, 1])
-    
-    with c1:
-        if st.button("⬅ VOLTAR"):
-            navegar("home")
-            
-    with c2:
-        if show_logo:
-            # Alinhamento forçado à direita com Flexbox
-            st.markdown(f"""
-                <div style="display: flex; justify-content: flex-end; align-items: center; height: 100%;">
-                    <a href="?menu=home" target="_self">
-                        <div style="background-color: white; border-radius: 50%; padding: 2px; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
-                            <img src="{logo_b64}" width="36" style="border-radius: 50%;">
-                        </div>
-                    </a>
-                </div>
-            """, unsafe_allow_html=True)
+    if st.button("⬅ VOLTAR"):
+        navegar("home")
     st.markdown('</div>', unsafe_allow_html=True)
 
 # =========================================================
@@ -263,7 +254,6 @@ def pagina_home(df):
     
     user = st.session_state['user_logado']
     
-    # Texto Centrado
     if user is None:
         st.markdown("<h3 style='text-align: center; margin-top: 10px;'>Bem vindo ao Kão Kente!<br>Já nos conhecemos?</h3>", unsafe_allow_html=True)
     else:
@@ -272,13 +262,11 @@ def pagina_home(df):
 
     st.write("") 
 
-    # Botão 1
     if st.button("🛵 ENCOMENDAR ON-LINE"):
         navegar("encomendas")
 
     st.write("")
 
-    # Botão 2
     if user is None:
         if st.button("👤 ENTRAR OU CRIAR CONTA"):
             navegar("login_menu")
@@ -288,7 +276,6 @@ def pagina_home(df):
 
     st.write("")
 
-    # Botão Linktree (HTML igual aos botões Streamlit)
     st.markdown(f"""
     <a href="{URL_LINKTREE}" target="_blank" style="text-decoration: none;">
         <div style="
@@ -314,7 +301,6 @@ def pagina_home(df):
     if user is not None:
         st.write("")
         st.markdown('<div class="nav-btn">', unsafe_allow_html=True)
-        # Botão pequeno para sair
         if st.button("Sair"):
             st.session_state['user_logado'] = None
             navegar("home")
@@ -324,11 +310,10 @@ def pagina_home(df):
 # PÁGINA: ENCOMENDAS
 # =========================================================
 def pagina_encomendas():
-    render_navigation(show_logo=True)
+    render_navigation(show_logo=False)
     
     st.markdown(f"<h2>Encomendar Online</h2>", unsafe_allow_html=True)
     
-    # Easter Egg
     st.markdown(f"""
     <a href="?menu=gest" target="_self" style="text-decoration: none;">
         <div style="
@@ -341,7 +326,6 @@ def pagina_encomendas():
     </a>
     """, unsafe_allow_html=True)
 
-    # Botão Externo Laranja
     st.markdown(f"""
     <a href="{URL_ENCOMENDAS}" target="_blank" style="text-decoration: none;">
         <div style="
@@ -355,7 +339,7 @@ def pagina_encomendas():
     </a>
     """, unsafe_allow_html=True)
     
-    st.markdown("<br>", unsafe_allow_html=True) # Apenas 1 quebra
+    st.markdown("<br>", unsafe_allow_html=True) 
     
     try:
         components.iframe(URL_ENCOMENDAS, height=800, scrolling=True)
@@ -366,12 +350,8 @@ def pagina_encomendas():
 # PÁGINA: LOGIN & REGISTO
 # =========================================================
 def pagina_login_menu(df):
-    render_logo_big() # Já tem o grande
-    
-    # Botão voltar manual sem logo pequeno
-    st.markdown('<div class="nav-btn">', unsafe_allow_html=True)
-    if st.button("⬅ VOLTAR"): navegar("home")
-    st.markdown('</div>', unsafe_allow_html=True)
+    render_logo_big() 
+    render_navigation(show_logo=False)
     
     st.markdown("""<style>.stTabs [data-baseweb="tab-list"] button {color: white !important;}</style>""", unsafe_allow_html=True)
     
@@ -404,20 +384,14 @@ def pagina_login_menu(df):
         r_pass1 = st.text_input("Palavra-passe", type="password", key="p1")
         r_pass2 = st.text_input("Repetir Palavra-passe", type="password", key="p2")
         
-        # MUDANÇA: Data Nascimento
         r_nascimento = st.date_input("Data de Nascimento", min_value=date(1920, 1, 1), max_value=date.today(), format="DD/MM/YYYY")
         idade_calc = calcular_idade(r_nascimento)
         
-        # MUDANÇA: Lógica de Estudante
         tipo_final = "Normal"
         if idade_calc > 0 and idade_calc <= 19:
-            # Pergunta explícita com Sim/Não
             resp_escola = st.radio("És aluno do Agrupamento de Escolas de Vila Viçosa?", ["Não", "Sim"], horizontal=True)
             if resp_escola == "Sim":
                 tipo_final = "Estudante"
-        else:
-            # Não mostra nada, assume Normal
-            pass
         
         r_comida = st.text_input("Comida Favorita no Kão Kente")
         r_local = st.text_input("Localidade de Residência")
@@ -448,7 +422,7 @@ def pagina_login_menu(df):
 # PÁGINA: PONTOS
 # =========================================================
 def pagina_pontos(df):
-    render_navigation(show_logo=True)
+    render_navigation(show_logo=False)
     user = st.session_state['user_logado']
     user = df[df['Telemovel'] == user['Telemovel']].iloc[0]
     
@@ -490,7 +464,7 @@ def pagina_pontos(df):
 # PÁGINA: ADMIN
 # =========================================================
 def pagina_admin_login():
-    render_navigation(show_logo=True)
+    render_navigation(show_logo=False)
     st.markdown("<h2>Acesso Staff</h2>", unsafe_allow_html=True)
     pwd = st.text_input("Password", type="password")
     if pwd == st.secrets.get("admin_password", "kaokente123"):
