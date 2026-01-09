@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import math
 import base64
-from datetime import datetime
+from datetime import datetime, date
 from streamlit_gsheets import GSheetsConnection
 import streamlit.components.v1 as components
 
@@ -19,6 +19,7 @@ COR_VERDE_ESCURO = "#0d974d"
 COR_BRANCO = "#ffffff"
 
 # --- ACESSO DIRETO VIA URL (LINK DEDICADO) ---
+# Link para usar: https://kaokente.streamlit.app/?menu=gest
 if "menu" in st.query_params and st.query_params["menu"] == "gest":
     if st.session_state.get('pagina') != 'admin_panel':
         st.session_state['pagina'] = 'admin_login'
@@ -59,24 +60,16 @@ st.markdown(f"""
         font-family: sans-serif;
     }}
 
-    /* === CORREÇÃO DA LARGURA DOS BOTÕES (A PARTE IMPORTANTE) === */
-    
-    /* Remove padding lateral do container do botão para ele tocar nas bordas */
+    /* === BOTÕES LARGURA TOTAL E ESTILO === */
     .stButton {{
         width: 100% !important;
-        padding-left: 0 !important;
-        padding-right: 0 !important;
         margin-top: 5px;
         margin-bottom: 5px;
     }}
     
-    /* Força o botão a ocupar 100% do espaço disponível */
     .stButton > button {{
         width: 100% !important;
         display: block !important;
-        box-sizing: border-box !important; /* Inclui a borda no cálculo da largura */
-        
-        /* Estilos Visuais */
         height: 3.8em !important;
         line-height: 1.5em !important; 
         border-radius: 12px !important;
@@ -92,29 +85,35 @@ st.markdown(f"""
     
     .stButton > button:active {{ transform: translateY(2px); }}
     
-    /* === CORREÇÃO NAVEGAÇÃO IPHONE (Forçar lado a lado) === */
-    @media (max-width: 640px) {{
-        /* Obriga as colunas a ficarem em linha e não empilhadas */
-        div[data-testid="column"] {{
-            width: 50% !important;
-            flex: 1 1 50% !important;
-            min-width: 50% !important;
-        }}
+    /* === CORREÇÃO NAVEGAÇÃO IPHONE (LADO A LADO) === */
+    /* Isto força os contentores horizontais a NÃO quebrarem linha no telemóvel */
+    div[data-testid="stHorizontalBlock"] {{
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+    }}
+    
+    /* Ajusta as colunas dentro do bloco horizontal para caberem (50% cada) */
+    div[data-testid="column"] {{
+        flex: 1 !important;
+        width: auto !important;
+        min-width: 0px !important;
     }}
 
-    /* Botões de Navegação (Voltar/Home) - Estilo específico */
+    /* Botões de Navegação (Voltar/Home) - Mais pequenos */
     .nav-btn .stButton > button {{
         height: 2.5em !important;
-        font-size: 0.9em !important;
+        font-size: 0.8em !important; /* Letra mais pequena para caber */
         background-color: white !important;
         color: {COR_FUNDO} !important;
         border: none !important;
         box-shadow: none !important;
+        padding: 0px !important;
     }}
 
     /* INPUTS (Caixas de Texto) */
     .stTextInput > div > div > input, 
-    .stNumberInput > div > div > input {{
+    .stNumberInput > div > div > input,
+    .stDateInput > div > div > input {{
         background-color: white !important;
         color: {COR_CASTANHO} !important;
         border-radius: 8px;
@@ -123,7 +122,8 @@ st.markdown(f"""
         font-weight: normal !important;
     }}
     
-    button[kind="secondary"] {{ color: {COR_CASTANHO} !important; }}
+    /* Ícones dentro dos inputs */
+    button[kind="secondary"], div[data-baseweb="calendar"] button {{ color: {COR_CASTANHO} !important; }}
     
     /* Selectbox */
     .stSelectbox > div > div {{
@@ -184,11 +184,15 @@ if 'pagina' not in st.session_state: st.session_state['pagina'] = "home"
 if 'user_logado' not in st.session_state: st.session_state['user_logado'] = None
 
 def navegar(destino):
-    st.query_params.clear()
+    st.query_params.clear() # Limpa o ?menu=gest se existir
     st.session_state['pagina'] = destino
     st.rerun()
 
 # --- LÓGICA ---
+def calcular_idade(data_nascimento):
+    hoje = date.today()
+    return hoje.year - data_nascimento.year - ((hoje.month, hoje.day) < (data_nascimento.month, data_nascimento.day))
+
 def calcular_pontos_ganhos(valor, tipo):
     mult = 7.5 if tipo == "Estudante" else 5.0
     return int(int(valor) * mult)
@@ -242,32 +246,27 @@ def save_data(df):
 
 # --- COMPONENTES VISUAIS ---
 def render_logo_centered_white_bg():
+    # Logo aumentado para 160px
     st.markdown(f"""
         <div style="display: flex; justify-content: center; margin-bottom: 0px;">
-            <div style="background-color: white; border-radius: 50%; padding: 5px; width: 140px; height: 140px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
+            <div style="background-color: white; border-radius: 50%; padding: 5px; width: 165px; height: 165px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
                 <a href="https://kaokente.streamlit.app/" target="_self">
-                    <img src="{logo_b64}" width="135" style="border-radius: 50%;">
+                    <img src="{logo_b64}" width="160" style="border-radius: 50%;">
                 </a>
             </div>
         </div>
     """, unsafe_allow_html=True)
 
 def render_navigation():
-    # Envolvemos numa div 'nav-btn' para o CSS aplicar o estilo de botão pequeno
+    # Botões de Navegação (Voltar e Home) 
     st.markdown('<div class="nav-btn">', unsafe_allow_html=True)
-    
-    # Usamos 2 colunas para garantir que ficam lado a lado
-    # O CSS @media(max-width: 640px) garante que não empilham no iPhone
-    c1, c2 = st.columns(2) 
-    
+    c1, c2 = st.columns(2)
     with c1:
         if st.button("⬅ Voltar"):
             navegar("home")
     with c2:
-        # Alinhamento à direita simulado por ser a 2ª coluna
         if st.button("🏠 Início"):
             navegar("home")
-            
     st.markdown('</div>', unsafe_allow_html=True)
 
 # =========================================================
@@ -304,7 +303,7 @@ def pagina_home(df):
 
     st.write("")
 
-    # Botão Linktree (HTML direto para match exato do verde)
+    # Botão Linktree
     st.markdown(f"""
     <a href="{URL_LINKTREE}" target="_blank" style="text-decoration: none;">
         <div style="
@@ -345,6 +344,7 @@ def pagina_encomendas():
     
     st.markdown(f"<h2>Encomendar Online</h2>", unsafe_allow_html=True)
     
+    # EASTER EGG para Gestão
     st.markdown(f"""
     <a href="?menu=gest" target="_self" style="text-decoration: none;">
         <div style="
@@ -363,7 +363,6 @@ def pagina_encomendas():
     </a>
     """, unsafe_allow_html=True)
 
-    # Botão Laranja (Link Externo)
     st.markdown(f"""
     <div style="text-align: center; margin-top: 15px;">
         <a href="{URL_ENCOMENDAS}" target="_blank" style="text-decoration: none;">
@@ -388,7 +387,6 @@ def pagina_encomendas():
     </div>
     """, unsafe_allow_html=True)
     
-    # ESPAÇAMENTO SOLICITADO
     st.markdown("<br><br><br>", unsafe_allow_html=True)
     
     try:
@@ -441,12 +439,16 @@ def pagina_login_menu(df):
         r_pass1 = st.text_input("Palavra-passe", type="password", key="p1")
         r_pass2 = st.text_input("Repetir Palavra-passe", type="password", key="p2")
         
-        r_idade = st.number_input("Idade", min_value=0, max_value=100, step=1, value=0)
+        # MUDANÇA: Data de Nascimento em vez de Idade
+        r_nascimento = st.date_input("Data de Nascimento", min_value=date(1920, 1, 1), max_value=date.today())
+        
+        # Cálculo Automático da Idade
+        idade_calc = calcular_idade(r_nascimento)
         
         is_estudante_check = False
-        if r_idade > 0:
-            if r_idade <= 19:
-                is_estudante_check = st.checkbox("Sim, sou aluno do Agrupamento de Escolas de Vila Viçosa.")
+        # Se tiver 19 anos ou menos
+        if idade_calc <= 19:
+            is_estudante_check = st.checkbox("Sim, sou aluno do Agrupamento de Escolas de Vila Viçosa.")
         
         r_comida = st.text_input("Comida Favorita no Kão Kente")
         r_local = st.text_input("Localidade de Residência")
@@ -462,12 +464,12 @@ def pagina_login_menu(df):
             elif r_email in df['Email'].values and r_email != "":
                 st.error("Este e-mail já está registado.")
             else:
-                tipo_final = "Estudante" if (is_estudante_check and r_idade <= 19) else "Normal"
+                tipo_final = "Estudante" if (is_estudante_check and idade_calc <= 19) else "Normal"
                 
                 novo_user = pd.DataFrame([{
                     "Telemovel": str(r_tel), "Nome": r_nome, "Apelido": r_apelido,
                     "Email": r_email, "Pontos": 0, "Historico": f"Conta criada em {datetime.now().strftime('%d/%m/%Y')}",
-                    "Password": r_pass1, "Tipo": tipo_final, "Idade": r_idade,
+                    "Password": r_pass1, "Tipo": tipo_final, "Idade": idade_calc, # Guarda a idade calculada
                     "ComidaFavorita": r_comida, "Localidade": r_local
                 }])
                 
@@ -642,8 +644,8 @@ def pagina_admin_panel(df):
         with t4:
             st.warning("Área Restrita")
             pass_master = st.text_input("Password Mestra", type="password")
-            # Define a tua password master aqui (ex: masterkk)
-            if pass_master == "masterkk":
+            # Define a tua password master aqui (ex: benfica)
+            if pass_master == "noronha":
                 st.dataframe(df)
 
 # --- MAIN LOOP ---
