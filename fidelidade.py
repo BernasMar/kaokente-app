@@ -9,14 +9,15 @@ import streamlit.components.v1 as components
 # --- CONFIGURAÇÃO INICIAL ---
 st.set_page_config(page_title="Kão Kente", page_icon="logo.png", layout="wide")
 
-# --- CORES DA MARCA ---
+# --- CORES DA MARCA (CORRIGIDAS) ---
 COR_FUNDO = "#946128"      # Castanho (Fundo do site)
+COR_CASTANHO = "#946128"   # Castanho (Para texto em fundos brancos)
 COR_BOTAO_FUNDO = "#f68625" # Laranja (Fundo dos botões)
 COR_BOTAO_TEXTO = "#9dddf9" # Azul Claro (Texto dos botões)
 COR_VERDE_CLARO = "#8db842"
 COR_VERDE_ESCURO = "#0d974d"
 COR_BRANCO = "#ffffff"
-COR_TEXTO_GERAL = "#ffffff" # Texto branco para ler bem no castanho
+COR_TEXTO_GERAL = "#ffffff" 
 
 # --- FUNÇÃO PARA CARREGAR IMAGEM LOCAL PARA HTML ---
 def get_image_base64(path):
@@ -36,7 +37,7 @@ st.markdown(f"""
     .block-container {{
         padding-top: 1rem;
         padding-bottom: 5rem;
-        max-width: 800px; /* Limita largura para ficar bonito em PC também */
+        max-width: 800px;
     }}
     
     /* Fundo da Aplicação */
@@ -68,7 +69,7 @@ st.markdown(f"""
     /* ESTILO GERAL DOS BOTÕES */
     .stButton > button {{
         width: 100%;
-        border-radius: 25px; /* Mais arredondado */
+        border-radius: 25px;
         height: 4em;
         background-color: {COR_BOTAO_FUNDO} !important;
         color: {COR_BOTAO_TEXTO} !important;
@@ -91,13 +92,13 @@ st.markdown(f"""
         transform: translateY(2px);
     }}
 
-    /* Inputs de texto (Caixas brancas para contraste) */
+    /* Inputs de texto (Caixas brancas) */
     .stTextInput > div > div > input, .stNumberInput > div > div > input, .stSelectbox > div > div > div {{
         border-radius: 10px;
         background-color: rgba(255, 255, 255, 0.95);
         color: #5a3a1a !important; /* Castanho escuro para o texto escrito */
         font-weight: bold;
-        text-align: center; /* Texto escrito ao centro */
+        text-align: center;
     }}
     
     /* Métricas */
@@ -116,14 +117,14 @@ st.markdown(f"""
         align-items: center;
     }}
 
-    /* Tabela (Dataframe) */
+    /* Tabela */
     div[data-testid="stDataFrame"] {{
         background-color: white;
         border-radius: 10px;
         padding: 5px;
     }}
 
-    /* Centralização de imagens e colunas */
+    /* Imagens */
     div[data-testid="stImage"] {{
         display: flex;
         justify-content: center;
@@ -214,7 +215,6 @@ def save_data(df):
 
 # --- COMPONENTES VISUAIS ---
 def render_logo_clickable():
-    # HTML para logo clicável e centrado
     st.markdown(f"""
         <div style="display: flex; justify-content: center; margin-bottom: 20px;">
             <a href="https://kaokente.streamlit.app/" target="_self">
@@ -300,7 +300,6 @@ def pagina_login_menu(df):
     
     if st.button("⬅ Voltar"): navegar("home")
     
-    # Truque para as Tabs ficarem visíveis no fundo castanho
     st.markdown("""<style>.stTabs [data-baseweb="tab-list"] button {color: white !important;}</style>""", unsafe_allow_html=True)
     
     tab_login, tab_registo = st.tabs(["ENTRAR", "CRIAR CONTA NOVA"])
@@ -314,7 +313,6 @@ def pagina_login_menu(df):
         
         if st.button("ENTRAR"):
             input_limpo = login_user.strip()
-            # Tenta encontrar string exata ou case insensitive no email
             u_tel = df[(df['Telemovel'] == input_limpo) & (df['Password'] == login_pass)]
             u_mail = df[(df['Email'].str.lower() == input_limpo.lower()) & (df['Password'] == login_pass)]
             
@@ -406,7 +404,6 @@ def pagina_pontos(df):
         cor_barra = COR_VERDE_ESCURO if percentagem >= 1.0 else COR_BOTAO_FUNDO
         icon = '🔓' if percentagem >= 1.0 else '🔒'
         
-        # Barra de Progresso HTML Customizada e Bonita
         st.markdown(f"""
         <div style="background-color: white; border-radius: 15px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
@@ -494,7 +491,6 @@ def pagina_admin_panel(df):
         c2.metric("Mês Atual", f"{ga}€")
         c3.metric("Mês Pass.", f"{gb}€")
         
-        # TABELA DE ABAS
         st.markdown("""<style>.stTabs [data-baseweb="tab-list"] button {color: white !important;}</style>""", unsafe_allow_html=True)
         t1, t2, t3, t4 = st.tabs(["💰 Lançar", "🎁 Resgatar", "✏️ Editar", "📊 Tabela"])
         
@@ -531,7 +527,7 @@ def pagina_admin_panel(df):
                 
                 c_c, c_d = st.columns(2)
                 with c_c: em = st.text_input("Email", value=d['Email'])
-                with c_d: etel = st.text_input("Telemóvel", value=d['Telemovel']) # ID change risk!
+                with c_d: etel = st.text_input("Telemóvel", value=d['Telemovel'])
                 
                 et = st.selectbox("Tipo", ["Normal", "Estudante"], index=0 if d['Tipo']=="Normal" else 1)
                 ei = st.number_input("Idade", value=int(d['Idade']) if d['Idade']!="" else 0)
