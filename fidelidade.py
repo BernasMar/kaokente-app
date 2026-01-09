@@ -36,138 +36,126 @@ logo_b64 = get_image_base64("logo.png")
 
 # --- CSS (CORREÇÕES VISUAIS DE FUNDO E SELECTBOX) ---
 st.markdown(f"""
-    <style>
-    .block-container {{
-        padding-top: 1rem;
-        padding-bottom: 5rem;
-        max-width: 600px;
-        margin: 0 auto;
-    }}
-    
-    .stApp {{ background-color: {COR_FUNDO}; }}
-    
-    #MainMenu, header, footer {{ visibility: hidden; }}
+<style>
+/* ---------------- CONTAINER ---------------- */
+.block-container {{
+    padding-top: 1rem;
+    padding-bottom: 5rem;
+    max-width: 600px;
+    margin: 0 auto;
+}}
 
-    h1, h2, h3, h4 {{
-        color: {COR_BRANCO} !important;
-        font-weight: 800 !important;
-        text-align: center !important;
-        margin-bottom: 20px !important;
-    }}
-    p, label, span, div {{
-        color: {COR_BRANCO};
-        font-family: sans-serif;
-    }}
+.stApp {{ background-color: {COR_FUNDO}; }}
 
-    /* BOTÕES LARANJA */
-    .stButton {{
-        width: 100% !important;
-        padding: 0 !important;
-        margin-top: 10px;
-        margin-bottom: 10px;
-        display: flex;
-        justify-content: center;
-    }}
-    
-    .stButton > button {{
-        width: 100% !important;
-        display: block !important;
-        height: 3.8em !important;
-        background-color: {COR_BOTAO_FUNDO} !important;
-        color: {COR_BOTAO_TEXTO} !important;
-        border: 2px solid {COR_BOTAO_TEXTO} !important;
-        border-radius: 12px !important;
-        font-weight: 800 !important;
-        font-size: 1.1em !important;
-        text-transform: uppercase !important;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.2) !important;
-        margin: 0 !important;
-    }}
-    .stButton > button:active {{ transform: translateY(2px); }}
+#MainMenu, header, footer {{ visibility: hidden; }}
 
-    /* BOTÃO DE VOLTAR */
-    .nav-btn .stButton > button {{
-        width: auto !important;
-        min-width: 100px;
-        height: 2.5em !important;
-        font-size: 0.9em !important;
-        background-color: white !important;
-        color: {COR_FUNDO} !important;
-        border: none !important;
-        box-shadow: none !important;
-        white-space: nowrap !important;
-        padding: 0 15px !important;
-    }}
+/* ---------------- TEXTO ---------------- */
+h1, h2, h3, h4 {{
+    color: {COR_BRANCO} !important;
+    font-weight: 800 !important;
+    text-align: center !important;
+    margin-bottom: 20px !important;
+}}
 
-    /* INPUTS DE TEXTO GERAIS */
-    .stTextInput > div > div > input, 
-    .stNumberInput > div > div > input,
-    .stDateInput > div > div > input {{
-        background-color: white !important;
-        color: {COR_CASTANHO} !important;
-        border-radius: 8px;
-        border: none;
-        text-align: left !important;
-    }}
-    
-    /* --- CORREÇÃO CRÍTICA PARA SELECTBOX (MENUS DE OPÇÕES) --- */
-    
-    /* 1. A caixa principal do Selectbox (antes de clicar) */
-    .stSelectbox div[data-baseweb="select"] > div {{
-        background-color: white !important;
-        border-color: white !important;
-        color: {COR_CASTANHO} !important;
-    }}
-    
-    /* 2. O texto dentro da caixa principal */
-    .stSelectbox div[data-baseweb="select"] span {{
-        color: {COR_CASTANHO} !important;
-    }}
-    
-    /* 3. A setinha (ícone SVG) */
-    .stSelectbox div[data-baseweb="select"] svg {{
-        fill: {COR_CASTANHO} !important;
-        color: {COR_CASTANHO} !important;
-    }}
-    
-    /* 4. O MENU DROPDOWN (A lista que abre) */
-    ul[data-baseweb="menu"] {{
-        background-color: white !important;
-    }}
-    
-    /* 5. As opções dentro da lista */
-    li[data-baseweb="option"] {{
-        color: {COR_CASTANHO} !important; /* Texto castanho */
-        background-color: white !important; /* Fundo branco */
-    }}
-    
-    /* 6. Opção selecionada ou hover */
-    li[data-baseweb="option"]:hover, li[data-baseweb="option"][aria-selected="true"] {{
-        background-color: #fce8d4 !important; /* Fundo laranja claro */
-        color: {COR_CASTANHO} !important;
-    }}
-    
-    /* Ícones genéricos dentro de inputs */
-    button[kind="secondary"], div[data-baseweb="calendar"] button {{ color: {COR_CASTANHO} !important; }}
-    
-    .stRadio label {{ color: {COR_BRANCO} !important; font-weight: bold; }}
+p, label {{
+    color: {COR_BRANCO} !important;
+    font-family: sans-serif;
+}}
 
-    .saldo-card {{
-        background-color: white;
-        border-radius: 20px;
-        padding: 20px;
-        text-align: center;
-        border: 4px solid {COR_BOTAO_TEXTO};
-        margin-bottom: 20px;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    }}
-    
-    div[data-testid="stImage"] {{
-        display: flex;
-        justify-content: center;
-        width: 100%;
-    }}
-    </style>
+/* ---------------- BOTÕES (TODOS) ---------------- */
+div.stButton,
+div[data-testid="stButton"] {{
+    width: 100% !important;
+    margin: 10px 0 !important;
+    display: block !important;
+}}
+
+div.stButton > button,
+div[data-testid="stButton"] > button {{
+    width: 100% !important;
+    height: 3.8em !important;
+    background-color: {COR_BOTAO_FUNDO} !important;
+    color: {COR_BOTAO_TEXTO} !important;
+    border: 2px solid {COR_BOTAO_TEXTO} !important;
+    border-radius: 12px !important;
+    font-weight: 800 !important;
+    font-size: 1.1em !important;
+    text-transform: uppercase !important;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2) !important;
+}}
+
+div.stButton > button:active {{
+    transform: translateY(2px);
+}}
+
+/* -------- BOTÃO VOLTAR -------- */
+.nav-btn div.stButton > button {{
+    width: auto !important;
+    min-width: 100px;
+    height: 2.5em !important;
+    font-size: 0.9em !important;
+    background-color: white !important;
+    color: {COR_FUNDO} !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 15px !important;
+}}
+
+/* ---------------- INPUTS ---------------- */
+.stTextInput input,
+.stNumberInput input,
+.stDateInput input {{
+    background-color: white !important;
+    color: {COR_CASTANHO} !important;
+    border-radius: 8px !important;
+    border: none !important;
+}}
+
+/* ---------------- SELECTBOX (STAFF FIX) ---------------- */
+.stSelectbox div[data-baseweb="select"] > div {{
+    background-color: white !important;
+    border-color: white !important;
+}}
+
+.stSelectbox span {{
+    color: {COR_CASTANHO} !important;
+}}
+
+.stSelectbox svg {{
+    fill: {COR_CASTANHO} !important;
+}}
+
+ul[data-baseweb="menu"] {{
+    background-color: white !important;
+}}
+
+li[data-baseweb="option"] {{
+    color: {COR_CASTANHO} !important;
+    background-color: white !important;
+}}
+
+li[data-baseweb="option"]:hover,
+li[data-baseweb="option"][aria-selected="true"] {{
+    background-color: #fce8d4 !important;
+    color: {COR_CASTANHO} !important;
+}}
+
+/* ---------------- CARDS ---------------- */
+.saldo-card {{
+    background-color: white;
+    border-radius: 20px;
+    padding: 20px;
+    text-align: center;
+    border: 4px solid {COR_BOTAO_TEXTO};
+    margin-bottom: 20px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}}
+
+div[data-testid="stImage"] {{
+    display: flex;
+    justify-content: center;
+}}
+</style>
 """, unsafe_allow_html=True)
 
 # --- LIGAÇÃO ---
