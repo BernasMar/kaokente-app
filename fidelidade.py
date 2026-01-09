@@ -19,7 +19,6 @@ COR_VERDE_ESCURO = "#0d974d"
 COR_BRANCO = "#ffffff"
 
 # --- ACESSO DIRETO VIA URL (LINK DEDICADO) ---
-# Link: kaokente.streamlit.app/?menu=gest
 if "menu" in st.query_params and st.query_params["menu"] == "gest":
     if st.session_state.get('pagina') != 'admin_panel':
         st.session_state['pagina'] = 'admin_login'
@@ -60,50 +59,60 @@ st.markdown(f"""
         font-family: sans-serif;
     }}
 
-    /* === BOTÕES STREAMLIT IGUAIS AO HTML VERDE === */
+    /* === CORREÇÃO DA LARGURA DOS BOTÕES (A PARTE IMPORTANTE) === */
+    
+    /* Remove padding lateral do container do botão para ele tocar nas bordas */
     .stButton {{
-        width: 100%;
+        width: 100% !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
         margin-top: 5px;
         margin-bottom: 5px;
     }}
     
+    /* Força o botão a ocupar 100% do espaço disponível */
     .stButton > button {{
         width: 100% !important;
         display: block !important;
+        box-sizing: border-box !important; /* Inclui a borda no cálculo da largura */
         
-        /* Dimensões Exatas do Botão Verde */
+        /* Estilos Visuais */
         height: 3.8em !important;
         line-height: 1.5em !important; 
         border-radius: 12px !important;
-        
-        /* Cores */
         background-color: {COR_BOTAO_FUNDO} !important;
         color: {COR_BOTAO_TEXTO} !important;
         border: 2px solid {COR_BOTAO_TEXTO} !important;
-        
-        /* Fonte */
         font-weight: 800 !important;
         font-size: 1.1em !important;
         text-transform: uppercase !important;
-        
-        /* Sombra */
         box-shadow: 0 4px 6px rgba(0,0,0,0.2) !important;
-        
         margin: 0 !important;
     }}
     
     .stButton > button:active {{ transform: translateY(2px); }}
     
-    /* Botões de Navegação (Voltar/Home) - Mais pequenos */
-    .nav-btn > button {{
+    /* === CORREÇÃO NAVEGAÇÃO IPHONE (Forçar lado a lado) === */
+    @media (max-width: 640px) {{
+        /* Obriga as colunas a ficarem em linha e não empilhadas */
+        div[data-testid="column"] {{
+            width: 50% !important;
+            flex: 1 1 50% !important;
+            min-width: 50% !important;
+        }}
+    }}
+
+    /* Botões de Navegação (Voltar/Home) - Estilo específico */
+    .nav-btn .stButton > button {{
         height: 2.5em !important;
         font-size: 0.9em !important;
         background-color: white !important;
         color: {COR_FUNDO} !important;
         border: none !important;
+        box-shadow: none !important;
     }}
 
-    /* INPUTS (Caixas de Texto) - Brancas com texto Castanho */
+    /* INPUTS (Caixas de Texto) */
     .stTextInput > div > div > input, 
     .stNumberInput > div > div > input {{
         background-color: white !important;
@@ -149,7 +158,6 @@ st.markdown(f"""
         box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     }}
     
-    /* Centralizar Imagens */
     div[data-testid="stImage"] {{
         display: flex;
         justify-content: center;
@@ -176,7 +184,6 @@ if 'pagina' not in st.session_state: st.session_state['pagina'] = "home"
 if 'user_logado' not in st.session_state: st.session_state['user_logado'] = None
 
 def navegar(destino):
-    # Limpa o ?menu=gest do URL para evitar loops
     st.query_params.clear()
     st.session_state['pagina'] = destino
     st.rerun()
@@ -235,7 +242,6 @@ def save_data(df):
 
 # --- COMPONENTES VISUAIS ---
 def render_logo_centered_white_bg():
-    # Aumentei a img src width para 135 para encher mais o círculo
     st.markdown(f"""
         <div style="display: flex; justify-content: center; margin-bottom: 0px;">
             <div style="background-color: white; border-radius: 50%; padding: 5px; width: 140px; height: 140px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
@@ -247,16 +253,21 @@ def render_logo_centered_white_bg():
     """, unsafe_allow_html=True)
 
 def render_navigation():
-    # Botões de Navegação (Voltar e Home) em todas as páginas
-    # Usamos uma classe CSS 'nav-btn' para eles não ficarem gigantes como os outros
+    # Envolvemos numa div 'nav-btn' para o CSS aplicar o estilo de botão pequeno
     st.markdown('<div class="nav-btn">', unsafe_allow_html=True)
-    c1, c2, c3 = st.columns([1, 3, 1])
+    
+    # Usamos 2 colunas para garantir que ficam lado a lado
+    # O CSS @media(max-width: 640px) garante que não empilham no iPhone
+    c1, c2 = st.columns(2) 
+    
     with c1:
         if st.button("⬅ Voltar"):
             navegar("home")
-    with c3:
+    with c2:
+        # Alinhamento à direita simulado por ser a 2ª coluna
         if st.button("🏠 Início"):
             navegar("home")
+            
     st.markdown('</div>', unsafe_allow_html=True)
 
 # =========================================================
@@ -293,7 +304,7 @@ def pagina_home(df):
 
     st.write("")
 
-    # Botão Linktree - Agora igual aos outros em tamanho
+    # Botão Linktree (HTML direto para match exato do verde)
     st.markdown(f"""
     <a href="{URL_LINKTREE}" target="_blank" style="text-decoration: none;">
         <div style="
@@ -334,7 +345,6 @@ def pagina_encomendas():
     
     st.markdown(f"<h2>Encomendar Online</h2>", unsafe_allow_html=True)
     
-    # EASTER EGG: Link para ?menu=gest
     st.markdown(f"""
     <a href="?menu=gest" target="_self" style="text-decoration: none;">
         <div style="
@@ -377,6 +387,9 @@ def pagina_encomendas():
         </a>
     </div>
     """, unsafe_allow_html=True)
+    
+    # ESPAÇAMENTO SOLICITADO
+    st.markdown("<br><br><br>", unsafe_allow_html=True)
     
     try:
         components.iframe(URL_ENCOMENDAS, height=800, scrolling=True)
@@ -629,8 +642,8 @@ def pagina_admin_panel(df):
         with t4:
             st.warning("Área Restrita")
             pass_master = st.text_input("Password Mestra", type="password")
-            # Define a tua password master aqui (ex: benfica)
-            if pass_master == "noronha":
+            # Define a tua password master aqui (ex: masterkk)
+            if pass_master == "masterkk":
                 st.dataframe(df)
 
 # --- MAIN LOOP ---
