@@ -75,7 +75,7 @@ st.markdown(f"""
         border: 2px solid {COR_BOTAO_TEXTO} !important; /* Borda Azul Clara */
         font-weight: 800 !important;
         font-size: 1.1em !important;
-        box-shadow: 0 4px 6px rgba(157, 221, 249, 1) !important;
+        box-shadow: 0 4px 6px rgba(157, 221, 249, 0.2) !important;
         text-transform: uppercase !important;
         margin: 0 !important;
     }}
@@ -131,7 +131,7 @@ st.markdown(f"""
         text-align: center;
         border: 4px solid {COR_BOTAO_TEXTO};
         margin-bottom: 20px;
-        box-shadow: 0 4px 8px rgba(157, 221, 249, 1);
+        box-shadow: 0 4px 8px rgba(157, 221, 249, 0.2);
     }}
     
     /* Centralizar Imagens */
@@ -282,7 +282,7 @@ def pagina_home(df):
             font-weight: 800; 
             font-size: 1.1em;
             border: 2px solid white; 
-            box-shadow: 0 4px 6px rgba(157, 221, 249, 1); 
+            box-shadow: 0 4px 6px rgba(157, 221, 249, 0.2); 
             text-transform: uppercase; 
             display: block; 
             width: 100%;
@@ -327,7 +327,7 @@ def pagina_encomendas():
                 font-weight: 800; 
                 font-size: 1.1em;
                 border: 2px solid {COR_BOTAO_TEXTO}; 
-                box-shadow: 0 4px 6px rgba(157, 221, 249, 1); 
+                box-shadow: 0 4px 6px rgba(157, 221, 249, 0.2); 
                 text-transform: uppercase; 
                 display: block; 
                 width: 100%;">
