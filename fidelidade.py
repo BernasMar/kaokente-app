@@ -8,12 +8,13 @@ import streamlit.components.v1 as components
 # --- CONFIGURAÇÃO INICIAL ---
 st.set_page_config(page_title="Kão Kente", page_icon="logo.png", layout="wide")
 
-# --- CORES DA MARCA (NOVAS DEFINIÇÕES) ---
-COR_FUNDO = "#8db842"      # Verde Claro (Fundo)
-COR_BOTAO_FUNDO = "#9dddf9" # Azul Claro
-COR_BOTAO_TEXTO = "#f68625" # Laranja Kão Kente
+# --- CORES DA MARCA (DEFINIÇÕES CORRIGIDAS) ---
+COR_FUNDO = "#8db842"      # Verde Claro (Fundo do site)
+COR_AZUL_CLARO = "#9dddf9" # Azul Claro (Fundo dos botões)
+COR_LARANJA = "#f68625"    # Laranja Kão Kente (Texto dos botões e Destaques)
 COR_VERDE_ESCURO = "#0d974d"
 COR_CASTANHO = "#946128"
+COR_CINZA = "#aea9a3"
 COR_BRANCO = "#ffffff"
 
 # --- CSS PERSONALIZADO (VISUAL COMPLETO) ---
@@ -46,8 +47,8 @@ st.markdown(f"""
         width: 100%;
         border-radius: 15px;
         height: 4em;
-        background-color: {COR_BOTAO_FUNDO} !important;
-        color: {COR_BOTAO_TEXTO} !important;
+        background-color: {COR_AZUL_CLARO} !important;
+        color: {COR_LARANJA} !important;
         font-weight: 900 !important; /* Negrito extra */
         font-size: 1.2em !important;
         border: 2px solid white !important; /* Borda branca para destacar no verde */
@@ -179,8 +180,6 @@ def save_data(df):
 
 # --- COMPONENTES VISUAIS ---
 def render_logo():
-    # Usa st.image normal para máxima nitidez
-    # use_column_width=False para não esticar
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         try:
@@ -211,10 +210,9 @@ def pagina_home(df):
 
         st.write("")
         
-        # Linktree como botão simulado
         st.markdown(f"""
         <a href="{URL_LINKTREE}" target="_blank" style="text-decoration: none;">
-            <div style="background-color: {COR_BOTAO_FUNDO}; color: {COR_BOTAO_TEXTO}; padding: 18px; border-radius: 15px; text-align: center; font-weight: 900; font-size: 1.2em; border: 2px solid white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-transform: uppercase;">
+            <div style="background-color: {COR_AZUL_CLARO}; color: {COR_LARANJA}; padding: 18px; border-radius: 15px; text-align: center; font-weight: 900; font-size: 1.2em; border: 2px solid white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-transform: uppercase;">
                 🌲 LinkTree Kão Kente
             </div>
         </a>
@@ -244,7 +242,7 @@ def pagina_home(df):
 
         st.markdown(f"""
         <a href="{URL_LINKTREE}" target="_blank" style="text-decoration: none;">
-            <div style="background-color: {COR_BOTAO_FUNDO}; color: {COR_BOTAO_TEXTO}; padding: 18px; border-radius: 15px; text-align: center; font-weight: 900; font-size: 1.2em; border: 2px solid white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-transform: uppercase;">
+            <div style="background-color: {COR_AZUL_CLARO}; color: {COR_LARANJA}; padding: 18px; border-radius: 15px; text-align: center; font-weight: 900; font-size: 1.2em; border: 2px solid white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-transform: uppercase;">
                 🌲 LinkTree Kão Kente
             </div>
         </a>
@@ -291,9 +289,6 @@ def pagina_login_menu(df):
         st.write("")
         st.markdown("**Preenche os dados para aderir ao clube:**")
         
-        # AQUI REMOVEMOS O st.form PARA SER REATIVO
-        # O 'Enter' não submete porque não há form. Apenas o botão cria.
-        
         col_a, col_b = st.columns(2)
         with col_a:
             r_nome = st.text_input("Nome Próprio")
@@ -312,7 +307,6 @@ def pagina_login_menu(df):
         
         is_estudante_check = False
         
-        # Se a idade mudar, isto aparece logo (sem Enter)
         if r_idade > 0:
             if r_idade <= 19:
                 st.markdown(f"**Tens {r_idade} anos. És aluno do Agrupamento de Escolas de Vila Viçosa?**")
@@ -414,7 +408,7 @@ def pagina_encomendas():
     st.markdown(f"""
     <a href="{URL_ENCOMENDAS}" target="_blank" style="text-decoration: none;">
         <div style="
-            background-color: {COR_BOTAO_FUNDO}; color: {COR_BOTAO_TEXTO}; padding: 16px; 
+            background-color: {COR_AZUL_CLARO}; color: {COR_LARANJA}; padding: 16px; 
             border-radius: 15px; text-align: center; font-weight: 900; 
             font-size: 1.2em; margin-bottom: 20px; box-shadow: 0 4px 0px rgba(0,0,0,0.2); border: 2px solid white; text-transform: uppercase;">
             ABRIR EMENTA COMPLETA ↗
