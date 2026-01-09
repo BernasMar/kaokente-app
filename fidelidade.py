@@ -8,13 +8,13 @@ import streamlit.components.v1 as components
 # --- CONFIGURAÇÃO INICIAL ---
 st.set_page_config(page_title="Kão Kente", page_icon="logo.png", layout="wide")
 
-# --- CORES DA MARCA ---
-COR_FUNDO = "#9dddf9"      # Azul claro
-COR_LARANJA = "#f68625"
-COR_VERDE_CLARO = "#8db842"
+# --- CORES DA MARCA (NOVAS DEFINIÇÕES) ---
+COR_FUNDO = "#8db842"      # Verde Claro (Fundo)
+COR_BOTAO_FUNDO = "#9dddf9" # Azul Claro
+COR_BOTAO_TEXTO = "#f68625" # Laranja Kão Kente
 COR_VERDE_ESCURO = "#0d974d"
 COR_CASTANHO = "#946128"
-COR_CINZA = "#aea9a3"
+COR_BRANCO = "#ffffff"
 
 # --- CSS PERSONALIZADO (VISUAL COMPLETO) ---
 st.markdown(f"""
@@ -29,50 +29,57 @@ st.markdown(f"""
     header {{visibility: hidden;}}
     footer {{visibility: hidden;}}
 
-    /* Estilo dos Títulos */
-    h1, h2, h3 {{
+    /* Estilo dos Títulos e Textos */
+    h1, h2, h3, h4 {{
         color: {COR_CASTANHO} !important;
         text-align: center !important;
+        font-weight: 800 !important;
     }}
     
-    p, div, span {{
-        color: #333;
+    p, label, span, div {{
+        color: #2c1e0b; /* Castanho muito escuro para leitura */
+        font-weight: 500;
     }}
 
-    /* Estilo Geral dos Botões (Removemos o branco) */
+    /* ESTILO GERAL DOS BOTÕES */
     .stButton > button {{
         width: 100%;
         border-radius: 15px;
-        height: 3.8em;
-        font-weight: bold;
-        font-size: 1.1em;
-        border: none;
-        box-shadow: 0 4px 0px rgba(0,0,0,0.2); /* Efeito 3D subtil */
+        height: 4em;
+        background-color: {COR_BOTAO_FUNDO} !important;
+        color: {COR_BOTAO_TEXTO} !important;
+        font-weight: 900 !important; /* Negrito extra */
+        font-size: 1.2em !important;
+        border: 2px solid white !important; /* Borda branca para destacar no verde */
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         transition: all 0.2s;
-        color: white !important;
+        text-transform: uppercase;
     }}
     
-    .stButton > button:active {{
-        transform: translateY(2px);
-        box-shadow: 0 2px 0px rgba(0,0,0,0.2);
+    .stButton > button:hover {{
+        transform: scale(1.02);
+        box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+        color: {COR_CASTANHO} !important; /* Muda cor ao passar o rato */
     }}
 
-    /* Classes para injetar cores nos botões via Python */
-    /* Nota: O Streamlit não deixa injetar classes diretamente nos botões facilmente,
-       então usamos o st.markdown para criar botões HTML ou aceitamos as cores do tema.
-       Vou forçar as cores primárias abaixo. */
-    
-    /* Inputs de texto (Login/Registo) */
-    .stTextInput > div > div > input {{
+    .stButton > button:active {{
+        transform: translateY(2px);
+    }}
+
+    /* Inputs de texto (Caixas brancas) */
+    .stTextInput > div > div > input, .stNumberInput > div > div > input {{
         border-radius: 10px;
-        border: 2px solid {COR_CASTANHO};
+        border: 2px solid white;
+        background-color: rgba(255, 255, 255, 0.9);
         color: {COR_CASTANHO};
+        font-weight: bold;
     }}
     
     /* Métricas */
     div[data-testid="stMetricValue"] {{
-        color: {COR_LARANJA} !important;
-        font-size: 2.5em !important;
+        color: white !important;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        font-size: 3em !important;
     }}
     div[data-testid="stMetricLabel"] {{
         color: {COR_CASTANHO} !important;
@@ -102,7 +109,7 @@ PREMIOS_PONTOS = {
 URL_ENCOMENDAS = "https://www.foodbooking.com/ordering/restaurant/menu?company_uid=e92e9690-8f0b-45e2-acca-6671a872abb9&restaurant_uid=5e09158f-4dc1-4b17-b9d5-687ca8510db8&facebook=true"
 URL_LINKTREE = "https://linktr.ee/KaoKente"
 
-# --- GESTÃO DE ESTADO (NAVEGAÇÃO INSTANTÂNEA) ---
+# --- GESTÃO DE ESTADO ---
 if 'pagina' not in st.session_state:
     st.session_state['pagina'] = "home"
 if 'user_logado' not in st.session_state:
@@ -146,12 +153,9 @@ def load_data():
         if df is None or df.empty: 
             return pd.DataFrame(columns=["Telemovel", "Nome", "Apelido", "Email", "Pontos", "Historico", "Password", "Tipo", "Idade", "ComidaFavorita", "Localidade"])
         
-        # Limpeza robusta para garantir que Telemovel é String sem .0
-        # Primeiro converte para numerico para tirar lixo, depois int, depois str
         df['Telemovel'] = pd.to_numeric(df['Telemovel'], errors='coerce').fillna(0).astype(int).astype(str)
-        df['Telemovel'] = df['Telemovel'].replace('0', '') # Remove zeros gerados por erros
+        df['Telemovel'] = df['Telemovel'].replace('0', '')
         
-        # Outras colunas
         cols_str = ['Nome', 'Apelido', 'Email', 'Historico', 'Password', 'Tipo', 'ComidaFavorita', 'Localidade']
         for c in cols_str:
             if c not in df.columns: df[c] = ""
@@ -163,9 +167,8 @@ def load_data():
         if 'Idade' not in df.columns: df['Idade'] = 0
         df['Idade'] = pd.to_numeric(df['Idade'], errors='coerce').fillna(0).astype(int)
         
-        return df[df['Telemovel'].str.len() > 3] # Filtra linhas vazias
-    except Exception as e:
-        # st.error(f"Debug DB: {e}") # Descomentar para ver erro
+        return df[df['Telemovel'].str.len() > 3]
+    except:
         return pd.DataFrame()
 
 def save_data(df):
@@ -176,25 +179,17 @@ def save_data(df):
 
 # --- COMPONENTES VISUAIS ---
 def render_logo():
-    # Logótipo Grande e Centrado
-    try:
-        st.image("logo.png", width=180) 
-    except:
-        st.markdown(f"<h1 style='color:{COR_LARANJA}'>Kão Kente</h1>", unsafe_allow_html=True)
-
-def botao_custom(texto, cor_fundo, key_btn=None, on_click=None):
-    # Truque CSS para pintar o botão específico
-    st.markdown(f"""
-        <style>
-        div.stButton > button:first-child {{
-            background-color: {cor_fundo} !important;
-            color: white !important;
-        }}
-        </style>""", unsafe_allow_html=True)
-    return st.button(texto, key=key_btn, on_click=on_click)
+    # Usa st.image normal para máxima nitidez
+    # use_column_width=False para não esticar
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        try:
+            st.image("logo.png", width=200) 
+        except:
+            st.markdown(f"<h1>Kão Kente</h1>", unsafe_allow_html=True)
 
 # =========================================================
-# PÁGINA: HOME (DINÂMICA)
+# PÁGINA: HOME
 # =========================================================
 def pagina_home(df):
     render_logo()
@@ -202,35 +197,29 @@ def pagina_home(df):
     user = st.session_state['user_logado']
     
     if user is None:
-        # VISÃO: NÃO LOGADO
         st.markdown("<h3>Bem vindo ao Kão Kente!<br>Já nos conhecemos?</h3>", unsafe_allow_html=True)
         st.write("")
         st.write("")
 
-        # 1. Botão Encomendar (Laranja)
-        st.markdown(f"""<style>div.stButton > button {{background-color: {COR_LARANJA} !important;}}</style>""", unsafe_allow_html=True)
         if st.button("🛵  ENCOMENDAR ON-LINE"):
             navegar("encomendas")
 
         st.write("")
 
-        # 2. Botão Entrar / Criar Conta (Verde Escuro)
-        st.markdown(f"""<style>div.stButton > button {{background-color: {COR_VERDE_ESCURO} !important;}}</style>""", unsafe_allow_html=True)
         if st.button("👤  ENTRAR OU CRIAR CONTA"):
             navegar("login_menu")
 
         st.write("")
         
-        # 3. Botão Linktree (Verde Claro)
+        # Linktree como botão simulado
         st.markdown(f"""
         <a href="{URL_LINKTREE}" target="_blank" style="text-decoration: none;">
-            <div style="background-color: {COR_VERDE_CLARO}; color: white; padding: 15px; border-radius: 15px; text-align: center; font-weight: bold; box-shadow: 0 4px 0px rgba(0,0,0,0.1);">
+            <div style="background-color: {COR_BOTAO_FUNDO}; color: {COR_BOTAO_TEXTO}; padding: 18px; border-radius: 15px; text-align: center; font-weight: 900; font-size: 1.2em; border: 2px solid white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-transform: uppercase;">
                 🌲 LinkTree Kão Kente
             </div>
         </a>
         """, unsafe_allow_html=True)
 
-        # Rodapé Admin
         st.write("")
         st.write("")
         st.divider()
@@ -239,29 +228,23 @@ def pagina_home(df):
             if st.button("🔐 Staff"): navegar("admin_login")
 
     else:
-        # VISÃO: LOGADO
         primeiro_nome = user['Nome'].split(" ")[0]
         st.markdown(f"<h3>Bem vindo ao Kão Kente, {primeiro_nome}!<br>O que vai ser hoje?</h3>", unsafe_allow_html=True)
         st.write("")
         
-        # 1. Encomendar (Laranja)
-        st.markdown(f"""<style>div.stButton > button {{background-color: {COR_LARANJA} !important;}}</style>""", unsafe_allow_html=True)
         if st.button("🛵  ENCOMENDAR ON-LINE"):
             navegar("encomendas")
             
         st.write("")
         
-        # 2. Meus Pontos (Verde Escuro)
-        st.markdown(f"""<style>div.stButton > button {{background-color: {COR_VERDE_ESCURO} !important;}}</style>""", unsafe_allow_html=True)
         if st.button("🏆  OS MEUS PONTOS"):
             navegar("pontos")
 
         st.write("")
 
-        # 3. Linktree
         st.markdown(f"""
         <a href="{URL_LINKTREE}" target="_blank" style="text-decoration: none;">
-            <div style="background-color: {COR_VERDE_CLARO}; color: white; padding: 15px; border-radius: 15px; text-align: center; font-weight: bold; box-shadow: 0 4px 0px rgba(0,0,0,0.1);">
+            <div style="background-color: {COR_BOTAO_FUNDO}; color: {COR_BOTAO_TEXTO}; padding: 18px; border-radius: 15px; text-align: center; font-weight: 900; font-size: 1.2em; border: 2px solid white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-transform: uppercase;">
                 🌲 LinkTree Kão Kente
             </div>
         </a>
@@ -282,7 +265,6 @@ def pagina_login_menu(df):
     
     tab_login, tab_registo = st.tabs(["ENTRAR", "CRIAR CONTA NOVA"])
     
-    # --- LOGIN ---
     with tab_login:
         st.write("")
         st.info("Podes entrar com Telemóvel ou E-mail.")
@@ -290,12 +272,8 @@ def pagina_login_menu(df):
         login_user = st.text_input("Telemóvel ou E-mail")
         login_pass = st.text_input("Palavra-passe", type="password")
         
-        st.markdown(f"""<style>div.stButton > button {{background-color: {COR_VERDE_ESCURO} !important;}}</style>""", unsafe_allow_html=True)
         if st.button("ENTRAR"):
-            # Lógica de Login Híbrido
             input_limpo = login_user.strip()
-            
-            # Tenta encontrar por telemóvel (exato) OU por email (case insensitive)
             u_tel = df[(df['Telemovel'] == input_limpo) & (df['Password'] == login_pass)]
             u_mail = df[(df['Email'].str.lower() == input_limpo.lower()) & (df['Password'] == login_pass)]
             
@@ -305,95 +283,98 @@ def pagina_login_menu(df):
             
             if user_found is not None:
                 st.session_state['user_logado'] = user_found
-                st.success(f"Olá {user_found['Nome']}!")
                 navegar("home")
             else:
-                st.error("Dados incorretos. Verifica se já criaste conta nova.")
+                st.error("Dados incorretos.")
 
-    # --- REGISTO (NOVO PARADIGMA) ---
     with tab_registo:
         st.write("")
         st.markdown("**Preenche os dados para aderir ao clube:**")
         
-        with st.form("form_registo"):
-            col_a, col_b = st.columns(2)
-            with col_a:
-                r_nome = st.text_input("Nome Próprio")
-            with col_b:
-                r_apelido = st.text_input("Apelido")
-            
-            r_tel = st.text_input("Número de Telemóvel")
-            r_email = st.text_input("E-mail")
-            
-            c_p1, c_p2 = st.columns(2)
-            with c_p1: r_pass1 = st.text_input("Palavra-passe", type="password")
-            with c_p2: r_pass2 = st.text_input("Repetir Palavra-passe", type="password")
-            
-            r_idade = st.number_input("Idade", min_value=5, max_value=100, step=1)
-            
-            # Lógica Estudante
-            is_estudante_check = False
-            if r_idade > 0 and r_idade <= 19:
-                st.markdown(f"Tens {r_idade} anos. Frequentadora do Agrupamento?")
-                is_estudante_check = st.checkbox("Sim, sou estudante do Agrupamento de Escolas de Vila Viçosa")
-            
-            r_comida = st.text_input("Comida Favorita no Kão Kente")
-            r_local = st.text_input("Localidade de Residência")
-            
-            submitted = st.form_submit_button("CRIAR CONTA")
-            
-            if submitted:
-                # Validações
-                if not (r_nome and r_tel and r_email and r_pass1):
-                    st.error("Preenche os campos obrigatórios.")
-                elif r_pass1 != r_pass2:
-                    st.error("As palavras-passe não coincidem.")
-                elif r_tel in df['Telemovel'].values:
-                    st.error("Este número de telemóvel já está registado.")
-                elif r_email in df['Email'].values and r_email != "":
-                    st.error("Este e-mail já está registado.")
-                else:
-                    # Define Tipo
-                    tipo_final = "Estudante" if (is_estudante_check and r_idade <= 19) else "Normal"
-                    
-                    # Cria novo registo
-                    novo_user = pd.DataFrame([{
-                        "Telemovel": str(r_tel),
-                        "Nome": r_nome,
-                        "Apelido": r_apelido,
-                        "Email": r_email,
-                        "Pontos": 0,
-                        "Historico": f"Conta criada em {datetime.now().strftime('%d/%m/%Y')}",
-                        "Password": r_pass1,
-                        "Tipo": tipo_final,
-                        "Idade": r_idade,
-                        "ComidaFavorita": r_comida,
-                        "Localidade": r_local
-                    }])
-                    
-                    df = pd.concat([df, novo_user], ignore_index=True)
-                    save_data(df)
-                    st.success("Conta criada com sucesso! Podes fazer login.")
+        # AQUI REMOVEMOS O st.form PARA SER REATIVO
+        # O 'Enter' não submete porque não há form. Apenas o botão cria.
+        
+        col_a, col_b = st.columns(2)
+        with col_a:
+            r_nome = st.text_input("Nome Próprio")
+        with col_b:
+            r_apelido = st.text_input("Apelido")
+        
+        r_tel = st.text_input("Número de Telemóvel")
+        r_email = st.text_input("E-mail")
+        
+        c_p1, c_p2 = st.columns(2)
+        with c_p1: r_pass1 = st.text_input("Palavra-passe", type="password", key="p1")
+        with c_p2: r_pass2 = st.text_input("Repetir Palavra-passe", type="password", key="p2")
+        
+        # IDADE REATIVA
+        r_idade = st.number_input("Idade", min_value=0, max_value=100, step=1, value=0)
+        
+        is_estudante_check = False
+        
+        # Se a idade mudar, isto aparece logo (sem Enter)
+        if r_idade > 0:
+            if r_idade <= 19:
+                st.markdown(f"**Tens {r_idade} anos. És aluno do Agrupamento de Escolas de Vila Viçosa?**")
+                is_estudante_check = st.checkbox("Sim, sou aluno do Agrupamento de Escolas de Vila Viçosa.")
+            else:
+                st.markdown(f"Tens {r_idade} anos. (Tipo: Normal)")
+        
+        r_comida = st.text_input("Comida Favorita no Kão Kente")
+        r_local = st.text_input("Localidade de Residência")
+        
+        st.write("")
+        # Botão final de submissão
+        if st.button("CRIAR CONTA AGORA"):
+            # Validações
+            if not (r_nome and r_tel and r_email and r_pass1):
+                st.error("Preenche os campos obrigatórios.")
+            elif r_pass1 != r_pass2:
+                st.error("As palavras-passe não coincidem.")
+            elif r_tel in df['Telemovel'].values:
+                st.error("Este número de telemóvel já está registado.")
+            elif r_email in df['Email'].values and r_email != "":
+                st.error("Este e-mail já está registado.")
+            else:
+                tipo_final = "Estudante" if (is_estudante_check and r_idade <= 19) else "Normal"
+                
+                novo_user = pd.DataFrame([{
+                    "Telemovel": str(r_tel),
+                    "Nome": r_nome,
+                    "Apelido": r_apelido,
+                    "Email": r_email,
+                    "Pontos": 0,
+                    "Historico": f"Conta criada em {datetime.now().strftime('%d/%m/%Y')}",
+                    "Password": r_pass1,
+                    "Tipo": tipo_final,
+                    "Idade": r_idade,
+                    "ComidaFavorita": r_comida,
+                    "Localidade": r_local
+                }])
+                
+                df = pd.concat([df, novo_user], ignore_index=True)
+                save_data(df)
+                st.balloons()
+                st.success("Conta criada com sucesso! Podes fazer login.")
 
 # =========================================================
-# PÁGINA: PONTOS (ÁREA PESSOAL)
+# PÁGINA: PONTOS
 # =========================================================
 def pagina_pontos(df):
     if st.button("⬅ Voltar"): navegar("home")
     
     user = st.session_state['user_logado']
-    # Atualiza dados frescos
+    # Atualiza dados
     user = df[df['Telemovel'] == user['Telemovel']].iloc[0]
     
-    st.markdown(f"<h2 style='color:{COR_VERDE_ESCURO}'>Área Pessoal</h2>", unsafe_allow_html=True)
-    st.markdown(f"**Cliente:** {user['Nome']} {user['Apelido']}")
+    st.markdown(f"<h2>Área Pessoal</h2>", unsafe_allow_html=True)
+    st.markdown(f"<h3 style='text-align:center'>{user['Nome']} {user['Apelido']}</h3>", unsafe_allow_html=True)
     
-    # CARD SALDO
     st.markdown(f"""
-    <div style="background-color: white; padding: 20px; border-radius: 15px; text-align: center; border: 3px solid {COR_LARANJA}; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-        <div style="color: {COR_CASTANHO}; font-size: 1.1em; font-weight: bold;">SALDO DISPONÍVEL</div>
-        <div style="color: {COR_LARANJA}; font-size: 3.5em; font-weight: bold;">{user['Pontos']}</div>
-        <div style="color: {COR_CINZA};">pontos acumulados</div>
+    <div style="background-color: #2c1e0b; padding: 20px; border-radius: 20px; text-align: center; border: 4px solid {COR_LARANJA}; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+        <div style="color: white; font-size: 1.1em; font-weight: bold; letter-spacing: 1px;">SALDO DISPONÍVEL</div>
+        <div style="color: {COR_LARANJA}; font-size: 4em; font-weight: 900;">{user['Pontos']}</div>
+        <div style="color: #ccc;">pontos acumulados</div>
     </div>
     """, unsafe_allow_html=True)
     
@@ -403,13 +384,13 @@ def pagina_pontos(df):
     for i, (p, c) in enumerate(PREMIOS_PONTOS.items()):
         can = user['Pontos'] >= c
         cor_borda = COR_VERDE_ESCURO if can else "#ddd"
-        bg_color = "white"
+        bg_color = "rgba(255,255,255,0.9)"
         icon = '✅' if can else '🔒'
         
         html_card = f"""
-        <div style="border: 2px solid {cor_borda}; border-radius: 10px; padding: 10px; margin-bottom: 10px; height: 100%; background-color: {bg_color}; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-            <div style="font-weight: bold; color: {COR_CASTANHO}; font-size: 0.95em; line-height: 1.2;">{p}</div>
-            <div style="color: {COR_CINZA}; font-size: 0.9em; margin-top: 5px;">{c} pts</div>
+        <div style="border: 3px solid {cor_borda}; border-radius: 12px; padding: 12px; margin-bottom: 12px; height: 100%; background-color: {bg_color};">
+            <div style="font-weight: 800; color: {COR_CASTANHO}; font-size: 1em; line-height: 1.1;">{p}</div>
+            <div style="color: #555; font-size: 0.9em; margin-top: 5px; font-weight: bold;">{c} pts</div>
             <div style="text-align: right; font-size: 1.5em; margin-top: -10px;">{icon}</div>
         </div>
         """
@@ -422,20 +403,20 @@ def pagina_pontos(df):
 def pagina_encomendas():
     if st.button("⬅ Voltar"): navegar("home")
     
-    st.markdown(f"<h2 style='color:{COR_LARANJA}'>Encomendar Online</h2>", unsafe_allow_html=True)
+    st.markdown(f"<h2>Encomendar Online</h2>", unsafe_allow_html=True)
     
     st.markdown("""
-    <div style="background-color: #fff3cd; color: #856404; padding: 15px; border-radius: 10px; border: 1px solid #ffeeba; margin-bottom: 15px; text-align: center;">
-        <b>Dica:</b> Se o menu não aparecer em baixo, clica no botão laranja!
+    <div style="background-color: white; color: #856404; padding: 15px; border-radius: 10px; border: 2px solid #ffeeba; margin-bottom: 15px; text-align: center;">
+        <b>Dica:</b> Se o menu não aparecer em baixo, clica no botão abaixo!
     </div>
     """, unsafe_allow_html=True)
 
     st.markdown(f"""
     <a href="{URL_ENCOMENDAS}" target="_blank" style="text-decoration: none;">
         <div style="
-            background-color: {COR_LARANJA}; color: white; padding: 16px; 
-            border-radius: 15px; text-align: center; font-weight: bold; 
-            font-size: 1.2em; margin-bottom: 20px; box-shadow: 0 4px 0px rgba(0,0,0,0.2);">
+            background-color: {COR_BOTAO_FUNDO}; color: {COR_BOTAO_TEXTO}; padding: 16px; 
+            border-radius: 15px; text-align: center; font-weight: 900; 
+            font-size: 1.2em; margin-bottom: 20px; box-shadow: 0 4px 0px rgba(0,0,0,0.2); border: 2px solid white; text-transform: uppercase;">
             ABRIR EMENTA COMPLETA ↗
         </div>
     </a>
@@ -447,7 +428,7 @@ def pagina_encomendas():
         pass
 
 # =========================================================
-# PÁGINA: ADMIN (STAFF)
+# PÁGINA: ADMIN
 # =========================================================
 def pagina_admin_login():
     if st.button("⬅ Voltar"): navegar("home")
@@ -468,7 +449,6 @@ def pagina_admin_panel(df):
     
     q = st.text_input("🔍 Pesquisar (Nome ou Telemóvel)")
     
-    # Filtro
     df_show = df.copy()
     if q:
         df_show = df[df['Nome'].str.lower().str.contains(q.lower()) | df['Telemovel'].str.contains(q)]
