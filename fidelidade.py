@@ -220,7 +220,7 @@ def save_data(df):
 def render_logo_centered_white_bg():
     st.markdown(f"""
         <div style="display: flex; justify-content: center; margin-bottom: 0px;">
-            <div style="background-color: white; border-radius: 50%; padding: 5px; width: 140px; height: 140px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
+            <div style="background-color: white; border-radius: 50%; padding: 5px; width: 140px; height: 140px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 8px rgba(157, 221, 249, 0.2);">
                 <a href="https://kaokente.streamlit.app/" target="_self">
                     <img src="{logo_b64}" width="125" style="border-radius: 50%;">
                 </a>
@@ -455,7 +455,7 @@ def pagina_pontos(df):
         cor_barra = COR_VERDE_ESCURO if can_redeem else COR_BOTAO_FUNDO
         
         st.markdown(f"""
-        <div style="background-color: white; border-radius: 15px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <div style="background-color: white; border-radius: 15px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(157, 221, 249, 0.2);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
                 <div style="font-weight: bold; color: {COR_CASTANHO}; font-size: 1.1em;">{p}</div>
                 <div style="font-size: 1.5em;">{icon}</div>
