@@ -19,7 +19,7 @@ COR_VERDE_ESCURO = "#0d974d"
 COR_BRANCO = "#ffffff"
 
 # --- ACESSO DIRETO VIA URL (LINK DEDICADO) ---
-# Link para usar: https://kaokente.streamlit.app/?menu=gest
+# Link: kaokente.streamlit.app/?menu=gest
 if "menu" in st.query_params and st.query_params["menu"] == "gest":
     if st.session_state.get('pagina') != 'admin_panel':
         st.session_state['pagina'] = 'admin_login'
@@ -40,7 +40,7 @@ st.markdown(f"""
     <style>
     /* Ajuste do topo */
     .block-container {{
-        padding-top: 2rem;
+        padding-top: 1rem;
         padding-bottom: 5rem;
         max-width: 700px;
     }}
@@ -63,51 +63,64 @@ st.markdown(f"""
     /* === BOTÕES LARGURA TOTAL E ESTILO === */
     .stButton {{
         width: 100% !important;
-        margin-top: 5px;
-        margin-bottom: 5px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        padding: 0 !important;
     }}
     
     .stButton > button {{
         width: 100% !important;
         display: block !important;
         height: 3.8em !important;
-        line-height: 1.5em !important; 
-        border-radius: 12px !important;
+        
+        /* O estilo "inspirado" no HTML */
         background-color: {COR_BOTAO_FUNDO} !important;
         color: {COR_BOTAO_TEXTO} !important;
         border: 2px solid {COR_BOTAO_TEXTO} !important;
+        border-radius: 12px !important;
         font-weight: 800 !important;
         font-size: 1.1em !important;
         text-transform: uppercase !important;
         box-shadow: 0 4px 6px rgba(0,0,0,0.2) !important;
+        
+        /* Centralização Vertical e Horizontal */
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 0 !important;
         margin: 0 !important;
     }}
     
     .stButton > button:active {{ transform: translateY(2px); }}
     
-    /* === CORREÇÃO NAVEGAÇÃO IPHONE (LADO A LADO) === */
-    /* Isto força os contentores horizontais a NÃO quebrarem linha no telemóvel */
-    div[data-testid="stHorizontalBlock"] {{
-        flex-direction: row !important;
-        flex-wrap: nowrap !important;
-    }}
-    
-    /* Ajusta as colunas dentro do bloco horizontal para caberem (50% cada) */
-    div[data-testid="column"] {{
-        flex: 1 !important;
-        width: auto !important;
-        min-width: 0px !important;
+    /* Remover texto extra dentro do botão que atrapalha */
+    .stButton > button p {{
+        font-size: inherit !important;
+        font-weight: inherit !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        line-height: normal !important;
     }}
 
-    /* Botões de Navegação (Voltar/Home) - Mais pequenos */
+    /* === CORREÇÃO NAVEGAÇÃO (VOLTAR + LOGO) === */
+    .nav-container {{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }}
+    
+    /* Botão Voltar (Mais pequeno e discreto) */
+    .nav-btn .stButton {{ width: auto !important; margin: 0 !important; }}
     .nav-btn .stButton > button {{
         height: 2.5em !important;
-        font-size: 0.8em !important; /* Letra mais pequena para caber */
+        width: auto !important;
+        font-size: 0.9em !important;
         background-color: white !important;
         color: {COR_FUNDO} !important;
         border: none !important;
         box-shadow: none !important;
-        padding: 0px !important;
+        padding: 0 15px !important;
     }}
 
     /* INPUTS (Caixas de Texto) */
@@ -184,12 +197,13 @@ if 'pagina' not in st.session_state: st.session_state['pagina'] = "home"
 if 'user_logado' not in st.session_state: st.session_state['user_logado'] = None
 
 def navegar(destino):
-    st.query_params.clear() # Limpa o ?menu=gest se existir
+    st.query_params.clear() # Limpa o ?menu=gest
     st.session_state['pagina'] = destino
     st.rerun()
 
 # --- LÓGICA ---
 def calcular_idade(data_nascimento):
+    if not data_nascimento: return 0
     hoje = date.today()
     return hoje.year - data_nascimento.year - ((hoje.month, hoje.day) < (data_nascimento.month, data_nascimento.day))
 
@@ -246,7 +260,6 @@ def save_data(df):
 
 # --- COMPONENTES VISUAIS ---
 def render_logo_centered_white_bg():
-    # Logo aumentado para 160px
     st.markdown(f"""
         <div style="display: flex; justify-content: center; margin-bottom: 0px;">
             <div style="background-color: white; border-radius: 50%; padding: 5px; width: 165px; height: 165px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
@@ -258,16 +271,29 @@ def render_logo_centered_white_bg():
     """, unsafe_allow_html=True)
 
 def render_navigation():
-    # Botões de Navegação (Voltar e Home) 
-    st.markdown('<div class="nav-btn">', unsafe_allow_html=True)
-    c1, c2 = st.columns(2)
-    with c1:
+    # BARRA DE NAVEGAÇÃO SUPERIOR
+    # Esquerda: Botão Voltar
+    # Direita: Pequeno Logo Circular (Link para Home)
+    
+    col_back, col_void, col_home = st.columns([1, 3, 1])
+    
+    with col_back:
+        st.markdown('<div class="nav-btn">', unsafe_allow_html=True)
         if st.button("⬅ Voltar"):
             navegar("home")
-    with c2:
-        if st.button("🏠 Início"):
-            navegar("home")
-    st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+        
+    with col_home:
+        # Mini Logo clicável que vai para a home
+        st.markdown(f"""
+            <div style="text-align: right;">
+                <a href="?menu=home" target="_self">
+                    <div style="display: inline-block; background-color: white; border-radius: 50%; padding: 2px; width: 40px; height: 40px; text-align: center; vertical-align: middle;">
+                        <img src="{logo_b64}" width="36" style="border-radius: 50%; margin-top: 0px;">
+                    </div>
+                </a>
+            </div>
+        """, unsafe_allow_html=True)
 
 # =========================================================
 # PÁGINA: HOME
@@ -303,7 +329,7 @@ def pagina_home(df):
 
     st.write("")
 
-    # Botão Linktree
+    # Botão Linktree (HTML direto para match exato do verde)
     st.markdown(f"""
     <a href="{URL_LINKTREE}" target="_blank" style="text-decoration: none;">
         <div style="
@@ -439,15 +465,15 @@ def pagina_login_menu(df):
         r_pass1 = st.text_input("Palavra-passe", type="password", key="p1")
         r_pass2 = st.text_input("Repetir Palavra-passe", type="password", key="p2")
         
-        # MUDANÇA: Data de Nascimento em vez de Idade
-        r_nascimento = st.date_input("Data de Nascimento", min_value=date(1920, 1, 1), max_value=date.today())
+        # MUDANÇA: Data de Nascimento (Formato DD/MM/YYYY)
+        r_nascimento = st.date_input("Data de Nascimento", min_value=date(1920, 1, 1), max_value=date.today(), format="DD/MM/YYYY")
         
         # Cálculo Automático da Idade
         idade_calc = calcular_idade(r_nascimento)
         
         is_estudante_check = False
         # Se tiver 19 anos ou menos
-        if idade_calc <= 19:
+        if idade_calc > 0 and idade_calc <= 19:
             is_estudante_check = st.checkbox("Sim, sou aluno do Agrupamento de Escolas de Vila Viçosa.")
         
         r_comida = st.text_input("Comida Favorita no Kão Kente")
@@ -469,7 +495,7 @@ def pagina_login_menu(df):
                 novo_user = pd.DataFrame([{
                     "Telemovel": str(r_tel), "Nome": r_nome, "Apelido": r_apelido,
                     "Email": r_email, "Pontos": 0, "Historico": f"Conta criada em {datetime.now().strftime('%d/%m/%Y')}",
-                    "Password": r_pass1, "Tipo": tipo_final, "Idade": idade_calc, # Guarda a idade calculada
+                    "Password": r_pass1, "Tipo": tipo_final, "Idade": idade_calc, 
                     "ComidaFavorita": r_comida, "Localidade": r_local
                 }])
                 
@@ -645,11 +671,16 @@ def pagina_admin_panel(df):
             st.warning("Área Restrita")
             pass_master = st.text_input("Password Mestra", type="password")
             # Define a tua password master aqui (ex: benfica)
-            if pass_master == "noronha":
+            if pass_master == "masterkk":
                 st.dataframe(df)
 
 # --- MAIN LOOP ---
 df = load_data()
+# Se o link tiver ?menu=home, resetamos a sessão para home
+if "menu" in st.query_params and st.query_params["menu"] == "home":
+    st.session_state['pagina'] = "home"
+    st.query_params.clear()
+
 p = st.session_state['pagina']
 
 if p == "home": pagina_home(df)
