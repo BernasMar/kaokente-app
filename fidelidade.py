@@ -19,6 +19,7 @@ COR_VERDE_ESCURO = "#0d974d"
 COR_BRANCO = "#ffffff"
 
 # --- ACESSO DIRETO VIA URL ---
+# Se o link tiver ?menu=staff, vai direto para o admin
 if "menu" in st.query_params and st.query_params["menu"] == "staff":
     if st.session_state.get('pagina') != 'admin_panel':
         st.session_state['pagina'] = 'admin_login'
@@ -59,9 +60,9 @@ st.markdown(f"""
         font-family: sans-serif;
     }}
 
-    /* BOTÕES STREAMLIT (Laranja) - FORÇAR LARGURA TOTAL IGUAL AO HTML */
+    /* BOTÕES STREAMLIT (Laranja) - FORÇAR LARGURA TOTAL E ESTILO */
     .stButton {{
-        width: 100%; /* Garante que o contentor do botão ocupa tudo */
+        width: 100%;
     }}
     
     .stButton > button {{
@@ -69,25 +70,18 @@ st.markdown(f"""
         display: block !important;
         border-radius: 12px !important;
         height: 3.8em !important;
-        line-height: 1.5em !important; /* Ajuste para centrar texto verticalmente */
         background-color: {COR_BOTAO_FUNDO} !important;
         color: {COR_BOTAO_TEXTO} !important; /* Texto Azul Claro */
         border: 2px solid {COR_BOTAO_TEXTO} !important; /* Borda Azul Clara */
         font-weight: 800 !important;
         font-size: 1.1em !important;
-        box-shadow: 0 4px 6px rgba(157, 221, 249, 0.2) !important;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.2) !important;
         text-transform: uppercase !important;
-        margin: 0 !important;
+        margin: 5px 0 !important;
     }}
     
     .stButton > button:active {{ transform: translateY(2px); }}
     
-    /* Remover padding interno extra do Streamlit para alinhar */
-    .stButton > button p {{
-        font-size: 1.1em !important;
-        font-weight: 800 !important;
-    }}
-
     /* INPUTS (Caixas de Texto) - Brancas com texto Castanho */
     .stTextInput > div > div > input, 
     .stNumberInput > div > div > input {{
@@ -99,6 +93,7 @@ st.markdown(f"""
         font-weight: normal !important;
     }}
     
+    /* Correção cores ícones input */
     button[kind="secondary"] {{ color: {COR_CASTANHO} !important; }}
     
     /* Selectbox */
@@ -110,19 +105,6 @@ st.markdown(f"""
     .stSelectbox div[data-baseweb="select"] span {{ color: {COR_CASTANHO} !important; }}
     .stSelectbox svg {{ fill: {COR_CASTANHO} !important; }}
 
-    /* EASTER EGG BUTTON */
-    .easter-egg > button {{
-        background-color: #fff3cd !important;
-        color: #856404 !important;
-        border: 1px solid #ffeeba !important;
-        font-weight: normal !important;
-        font-size: 0.9em !important;
-        height: auto !important;
-        padding: 15px !important;
-        text-transform: none !important;
-        white-space: normal !important;
-    }}
-
     /* CARD DE SALDO */
     .saldo-card {{
         background-color: white;
@@ -131,7 +113,7 @@ st.markdown(f"""
         text-align: center;
         border: 4px solid {COR_BOTAO_TEXTO};
         margin-bottom: 20px;
-        box-shadow: 0 4px 8px rgba(157, 221, 249, 0.2);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     }}
     
     /* Centralizar Imagens */
@@ -220,7 +202,7 @@ def save_data(df):
 def render_logo_centered_white_bg():
     st.markdown(f"""
         <div style="display: flex; justify-content: center; margin-bottom: 0px;">
-            <div style="background-color: white; border-radius: 50%; padding: 5px; width: 140px; height: 140px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 8px rgba(157, 221, 249, 0.2);">
+            <div style="background-color: white; border-radius: 50%; padding: 5px; width: 140px; height: 140px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
                 <a href="https://kaokente.streamlit.app/" target="_self">
                     <img src="{logo_b64}" width="125" style="border-radius: 50%;">
                 </a>
@@ -232,33 +214,27 @@ def render_logo_centered_white_bg():
 # PÁGINA: HOME
 # =========================================================
 def pagina_home(df):
-    # 1. Logo
     render_logo_centered_white_bg()
     
-    # Espaçamento igual entre Logo e Texto (ajustado com margin-bottom no logo e st.write aqui)
     st.write("") 
     st.write("")
     
     user = st.session_state['user_logado']
     
-    # 2. Texto
     if user is None:
         st.markdown("<h3>Bem vindo ao Kão Kente!<br>Já nos conhecemos?</h3>", unsafe_allow_html=True)
     else:
         primeiro_nome = user['Nome'].split(" ")[0]
         st.markdown(f"<h3>Bem vindo ao Kão Kente, {primeiro_nome}!<br>O que vai ser hoje?</h3>", unsafe_allow_html=True)
 
-    # Espaçamento igual entre Texto e 1º Botão
     st.write("") 
     st.write("")
 
-    # 3. Botão 1: Encomendar (Styling via CSS global)
     if st.button("🛵 ENCOMENDAR ON-LINE"):
         navegar("encomendas")
 
-    st.write("") # Espaço entre botões
+    st.write("")
 
-    # 4. Botão 2: Contextual
     if user is None:
         if st.button("👤 ENTRAR OU CRIAR CONTA"):
             navegar("login_menu")
@@ -266,9 +242,9 @@ def pagina_home(df):
         if st.button("🏆 OS MEUS PONTOS"):
             navegar("pontos")
 
-    st.write("") # Espaço entre botões
+    st.write("")
 
-    # 5. Botão 3: Linktree (HTML direto para match exato do verde)
+    # Botão Linktree (HTML direto para match exato do verde)
     st.markdown(f"""
     <a href="{URL_LINKTREE}" target="_blank" style="text-decoration: none;">
         <div style="
@@ -282,11 +258,11 @@ def pagina_home(df):
             font-weight: 800; 
             font-size: 1.1em;
             border: 2px solid white; 
-            box-shadow: 0 4px 6px rgba(157, 221, 249, 0.2); 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2); 
             text-transform: uppercase; 
             display: block; 
             width: 100%;
-            margin-top: 0px;">
+            margin-top: 5px;">
             🌲 LinkTree Kão Kente
         </div>
     </a>
@@ -306,13 +282,27 @@ def pagina_encomendas():
     
     st.markdown(f"<h2>Encomendar Online</h2>", unsafe_allow_html=True)
     
-    # EASTER EGG - Caixa de Aviso clicável
-    st.markdown('<div class="easter-egg">', unsafe_allow_html=True)
-    if st.button("Dica: Se a nossa plataforma de pedidos on-line não aparecer nesta página devido a um aviso de cookies (ou se a quiseres utilizar numa nova janela dedicada), basta clicar no botão abaixo!"):
-        navegar("admin_login")
-    st.markdown('</div>', unsafe_allow_html=True)
+    # EASTER EGG: Caixa de Texto que é um Link para Admin
+    # Parece um aviso, mas clica-se e vai para ?menu=staff
+    st.markdown(f"""
+    <a href="?menu=staff" target="_self" style="text-decoration: none;">
+        <div style="
+            background-color: white;
+            color: #856404;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #ffeeba;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 0.9em;
+            line-height: 1.4;
+        ">
+            Dica: Se a nossa plataforma de pedidos on-line não aparecer nesta página devido a um aviso de cookies (ou se a quiseres utilizar numa nova janela dedicada), basta clicar no botão abaixo!
+        </div>
+    </a>
+    """, unsafe_allow_html=True)
 
-    # Botão Laranja (Usando o estilo HTML para consistência aqui também)
+    # Botão Laranja (Link Externo - Visual consistente)
     st.markdown(f"""
     <div style="text-align: center; margin-top: 15px;">
         <a href="{URL_ENCOMENDAS}" target="_blank" style="text-decoration: none;">
@@ -327,7 +317,7 @@ def pagina_encomendas():
                 font-weight: 800; 
                 font-size: 1.1em;
                 border: 2px solid {COR_BOTAO_TEXTO}; 
-                box-shadow: 0 4px 6px rgba(157, 221, 249, 0.2); 
+                box-shadow: 0 4px 6px rgba(0,0,0,0.2); 
                 text-transform: uppercase; 
                 display: block; 
                 width: 100%;">
@@ -430,7 +420,6 @@ def pagina_pontos(df):
     if st.button("⬅ Voltar"): navegar("home")
     
     user = st.session_state['user_logado']
-    # Refresh
     user = df[df['Telemovel'] == user['Telemovel']].iloc[0]
     
     st.markdown(f"<h2>Área Pessoal</h2>", unsafe_allow_html=True)
@@ -455,7 +444,7 @@ def pagina_pontos(df):
         cor_barra = COR_VERDE_ESCURO if can_redeem else COR_BOTAO_FUNDO
         
         st.markdown(f"""
-        <div style="background-color: white; border-radius: 15px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(157, 221, 249, 0.2);">
+        <div style="background-color: white; border-radius: 15px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
                 <div style="font-weight: bold; color: {COR_CASTANHO}; font-size: 1.1em;">{p}</div>
                 <div style="font-size: 1.5em;">{icon}</div>
