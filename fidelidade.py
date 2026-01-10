@@ -34,7 +34,7 @@ def get_image_base64(path):
 
 logo_b64 = get_image_base64("logo.png")
 
-# --- CSS (COM A CORREÇÃO DE TEXTO NOS BOTÕES) ---
+# --- CSS (CORREÇÕES FINAIS: CALENDÁRIO + BOTÕES + MENUS) ---
 st.markdown(f"""
     <style>
     /* Ajuste do contentor principal */
@@ -60,7 +60,7 @@ st.markdown(f"""
         font-family: sans-serif;
     }}
 
-    /* === BOTÕES (ESTILO SIMPLES + LARGURA TOTAL) === */
+    /* === BOTÕES (LARGURA TOTAL + TEXTO AZUL) === */
     .stButton > button {{
         background-color: {COR_BOTAO_FUNDO} !important;
         color: {COR_BOTAO_TEXTO} !important;
@@ -74,8 +74,7 @@ st.markdown(f"""
     }}
     .stButton > button:active {{ transform: translateY(2px); }}
     
-    /* CORREÇÃO CRÍTICA: Força o texto dentro do botão a ser AZUL e NEGRITO */
-    /* Isto sobrepõe a regra global que pintava tudo de branco */
+    /* Forçar texto dentro do botão a ser AZUL (sobrepor regra geral) */
     .stButton > button p {{
         color: {COR_BOTAO_TEXTO} !important;
         font-weight: 800 !important;
@@ -93,7 +92,7 @@ st.markdown(f"""
         color: {COR_FUNDO} !important;
     }}
 
-    /* === INPUTS & DROPDOWNS (PRESERVAR LEGIBILIDADE) === */
+    /* === INPUTS & DROPDOWNS === */
     .stTextInput > div > div > input, 
     .stNumberInput > div > div > input,
     .stDateInput > div > div > input {{
@@ -113,6 +112,37 @@ st.markdown(f"""
     ul[data-baseweb="menu"] {{ background-color: white !important; }}
     li[data-baseweb="option"] {{ color: {COR_CASTANHO} !important; background-color: white !important; }}
     
+    /* === CORREÇÃO CALENDÁRIO (DATE PICKER) === */
+    /* Fundo do calendário */
+    div[data-baseweb="calendar"] {{
+        background-color: white !important;
+    }}
+    
+    /* Todo o texto dentro do calendário (Mês, Dias, Ano) */
+    div[data-baseweb="calendar"] div {{
+        color: {COR_CASTANHO} !important;
+    }}
+    
+    /* Botões dos dias */
+    div[data-baseweb="calendar"] button {{
+        color: {COR_CASTANHO} !important;
+        background-color: white !important;
+    }}
+    
+    /* Setas de navegação */
+    div[data-baseweb="calendar"] svg {{
+        fill: {COR_CASTANHO} !important;
+    }}
+    
+    /* Dia Selecionado (Laranja com texto azul ou branco) */
+    div[data-baseweb="calendar"] button[aria-selected="true"] {{
+        background-color: {COR_BOTAO_FUNDO} !important;
+        color: white !important;
+    }}
+    div[data-baseweb="calendar"] button[aria-selected="true"]:hover {{
+        background-color: {COR_BOTAO_FUNDO} !important;
+    }}
+
     /* Ícones e Labels */
     button[kind="secondary"], div[data-baseweb="calendar"] button {{ color: {COR_CASTANHO} !important; }}
     .stRadio label {{ color: {COR_BRANCO} !important; font-weight: bold; }}
