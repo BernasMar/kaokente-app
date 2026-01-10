@@ -34,7 +34,7 @@ def get_image_base64(path):
 
 logo_b64 = get_image_base64("logo.png")
 
-# --- CSS (CORREÇÕES: DROPDOWNS, LINKTREE E ALERTAS) ---
+# --- CSS (CORREÇÕES ESPECÍFICAS: DROPDOWNS E ESPAÇAMENTOS) ---
 st.markdown(f"""
     <style>
     /* Ajuste do contentor principal */
@@ -60,7 +60,7 @@ st.markdown(f"""
         font-family: sans-serif;
     }}
 
-    /* === BOTÕES (ESTILO SIMPLES) === */
+    /* === BOTÕES (ESTILO BASE) === */
     .stButton > button {{
         background-color: {COR_BOTAO_FUNDO} !important;
         color: {COR_BOTAO_TEXTO} !important;
@@ -83,7 +83,7 @@ st.markdown(f"""
         font-size: 0.9em !important;
     }}
 
-    /* === INPUTS & DROPDOWNS (CORREÇÃO DE CORES) === */
+    /* === INPUTS GERAIS === */
     .stTextInput > div > div > input, 
     .stNumberInput > div > div > input,
     .stDateInput > div > div > input {{
@@ -92,30 +92,48 @@ st.markdown(f"""
         border-radius: 8px;
     }}
     
-    /* --- CORREÇÃO DOS DROPDOWNS (SELECTBOX) --- */
-    /* Garante que o texto dentro do selectbox e do menu flutuante seja CASTANHO e não branco */
+    /* === CORREÇÃO DOS DROPDOWNS (SELECTBOX) - BRANCO NO BRANCO === */
     
+    /* 1. A caixa fechada */
     div[data-baseweb="select"] > div {{
         background-color: white !important;
         color: {COR_CASTANHO} !important;
+        border-color: white !important;
     }}
     
-    /* Texto da opção selecionada e texto nas opções da lista */
-    div[data-baseweb="select"] span,
-    div[data-baseweb="popover"] li,
-    div[data-baseweb="popover"] div {{
+    /* 2. O texto selecionado dentro da caixa */
+    div[data-baseweb="select"] span {{
         color: {COR_CASTANHO} !important;
     }}
     
-    /* Seta do dropdown */
+    /* 3. A seta do dropdown */
     div[data-baseweb="select"] svg {{
         fill: {COR_CASTANHO} !important;
     }}
     
-    /* Fundo da lista de opções */
-    ul[data-baseweb="menu"] {{
+    /* 4. A lista de opções (Popover) */
+    div[data-baseweb="popover"] {{
         background-color: white !important;
     }}
+    
+    /* 5. As opções dentro da lista */
+    div[data-baseweb="popover"] li, 
+    div[data-baseweb="popover"] div {{
+        color: {COR_CASTANHO} !important;
+        background-color: white !important;
+    }}
+    
+    /* 6. Opção quando passamos o rato por cima (Hover) */
+    li[data-baseweb="option"]:hover, 
+    li[data-baseweb="option"][aria-selected="true"] {{
+        background-color: #fce8d4 !important; /* Laranja muito claro */
+        color: {COR_CASTANHO} !important;
+    }}
+    
+    /* === CALENDÁRIO === */
+    div[data-baseweb="calendar"] {{ background-color: white !important; }}
+    div[data-baseweb="calendar"] button {{ color: {COR_CASTANHO} !important; }}
+    div[data-baseweb="calendar"] div {{ color: {COR_CASTANHO} !important; }}
     
     /* Ícones e Labels */
     button[kind="secondary"], div[data-baseweb="calendar"] button {{ color: {COR_CASTANHO} !important; }}
@@ -304,12 +322,11 @@ def pagina_home(df):
 
     st.write("")
 
-    # Botão LinkTree com COR_BOTAO_TEXTO (Azul)
     st.markdown(f"""
     <a href="{URL_LINKTREE}" target="_blank" style="text-decoration: none;">
         <div style="
             background-color: {COR_VERDE_CLARO}; 
-            color: {COR_BOTAO_TEXTO}; 
+            color: white; 
             line-height: 3.5em;
             height: 3.5em;
             border-radius: 12px; 
@@ -587,7 +604,6 @@ def pagina_admin_panel(df):
                     save_data(df); st.success("Guardado")
             st.divider()
             with st.expander("🗑️ Apagar Cliente"):
-                # Caixa com margem inferior para o espaçamento solicitado
                 st.markdown(f"""
                 <div style="background-color: #ffcdd2; padding: 20px; border-radius: 10px; border: 3px solid #b71c1c; text-align: center; margin-bottom: 20px;">
                     <h3 style="color: #b71c1c !important;">⚠️ ATENÇÃO ⚠️</h3>
