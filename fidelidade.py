@@ -313,7 +313,7 @@ def pagina_home(df):
     user = st.session_state['user_logado']
     
     if user is None:
-        st.markdown("<h3 style='text-align: center; margin-top: 10px;'>Bem vindo ao Kão Kente!<br> Já nos conhecemos?</h3>", unsafe_allow_html=True)
+        st.markdown("<h3 style='text-align: center; margin-top: 10px;'>Bem vindo ao Kão Kente!<br>  Já nos conhecemos?</h3>", unsafe_allow_html=True)
     else:
         primeiro_nome = user['Nome'].split(" ")[0]
         st.markdown(f"<h3 style='text-align: center; margin-top: 10px;'>Bem vindo ao Kão Kente, {primeiro_nome}!<br> O que vai ser hoje?</h3>", unsafe_allow_html=True)
