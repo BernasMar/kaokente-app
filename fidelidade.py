@@ -34,7 +34,7 @@ def get_image_base64(path):
 
 logo_b64 = get_image_base64("logo.png")
 
-# --- CSS (CORREÇÃO DE DROPDOWNS E BOTÕES) ---
+# --- CSS (CORREÇÕES DETALHADAS) ---
 st.markdown(f"""
     <style>
     /* Ajuste do contentor principal */
@@ -49,7 +49,7 @@ st.markdown(f"""
     
     #MainMenu, header, footer {{ visibility: hidden; }}
 
-    /* TEXTOS GERAIS */
+    /* TEXTOS */
     h1, h2, h3, h4 {{
         color: {COR_BRANCO} !important;
         font-weight: 800 !important;
@@ -60,7 +60,7 @@ st.markdown(f"""
         font-family: sans-serif;
     }}
 
-    /* === BOTÕES (ESTILO SIMPLES) === */
+    /* === BOTÕES === */
     .stButton > button {{
         background-color: {COR_BOTAO_FUNDO} !important;
         color: {COR_BOTAO_TEXTO} !important;
@@ -73,14 +73,8 @@ st.markdown(f"""
         box-shadow: 0 4px 6px rgba(0,0,0,0.2) !important;
     }}
     .stButton > button:active {{ transform: translateY(2px); }}
-    
-    /* Forçar texto dentro do botão a ser AZUL (sobrepor regra geral) */
-    .stButton > button p {{
-        color: {COR_BOTAO_TEXTO} !important;
-        font-weight: 800 !important;
-    }}
 
-    /* Botão Voltar (Branco) - Exceção */
+    /* Botão Voltar (Branco) */
     .nav-btn .stButton > button {{
         background-color: white !important;
         color: {COR_FUNDO} !important;
@@ -88,11 +82,8 @@ st.markdown(f"""
         height: 2.5em !important;
         font-size: 0.9em !important;
     }}
-    .nav-btn .stButton > button p {{
-        color: {COR_FUNDO} !important;
-    }}
 
-    /* === INPUTS DE TEXTO === */
+    /* === INPUTS GERAIS === */
     .stTextInput > div > div > input, 
     .stNumberInput > div > div > input,
     .stDateInput > div > div > input {{
@@ -100,54 +91,44 @@ st.markdown(f"""
         color: {COR_CASTANHO} !important;
         border-radius: 8px;
     }}
-
-    /* === CORREÇÃO "NUCLEAR" PARA SELECTBOX (DROPDOWNS) === */
-    /* Força TUDO (*) dentro do seletor a ser castanho */
-    div[data-baseweb="select"] * {{
+    
+    /* === CORREÇÃO DROPDOWNS (MENU ABERTO) === */
+    /* Isto ataca a lista flutuante (popover) */
+    div[data-baseweb="popover"] {{
+        background-color: white !important;
+    }}
+    div[data-baseweb="popover"] div, 
+    div[data-baseweb="popover"] li, 
+    div[data-baseweb="popover"] ul {{
         color: {COR_CASTANHO} !important;
+        background-color: white !important;
     }}
     
-    /* Caixa principal do Selectbox */
+    /* Opção selecionada ou hover na lista */
+    li[data-baseweb="option"]:hover, 
+    li[data-baseweb="option"][aria-selected="true"] {{
+        background-color: #fce8d4 !important; /* Laranja claro */
+        color: {COR_CASTANHO} !important;
+    }}
+
+    /* === CORREÇÃO DROPDOWNS (CAIXA FECHADA) === */
     div[data-baseweb="select"] > div {{
         background-color: white !important;
-        border-color: white !important;
+        color: {COR_CASTANHO} !important;
     }}
-    
-    /* Ícone da seta SVG */
-    div[data-baseweb="select"] svg {{
-        fill: {COR_CASTANHO} !important;
+    div[data-baseweb="select"] span {{ 
+        color: {COR_CASTANHO} !important; 
     }}
-    
-    /* Menu Pop-up (A lista de opções) */
-    ul[data-baseweb="menu"] {{
-        background-color: white !important;
-    }}
-    
-    /* Cada opção da lista */
-    li[data-baseweb="option"] {{
-        background-color: white !important;
+    div[data-baseweb="select"] svg {{ 
+        fill: {COR_CASTANHO} !important; 
         color: {COR_CASTANHO} !important;
     }}
     
-    /* Hover na lista */
-    li[data-baseweb="option"]:hover {{
-        background-color: #fce8d4 !important;
-    }}
+    /* Calendário */
+    div[data-baseweb="calendar"] {{ background-color: white !important; }}
+    div[data-baseweb="calendar"] button {{ color: {COR_CASTANHO} !important; }}
+    div[data-baseweb="calendar"] div {{ color: {COR_CASTANHO} !important; }}
     
-    /* === CORREÇÃO CALENDÁRIO === */
-    div[data-baseweb="calendar"] {{
-        background-color: white !important;
-    }}
-    div[data-baseweb="calendar"] button {{
-        color: {COR_CASTANHO} !important;
-    }}
-    div[data-baseweb="calendar"] div {{
-        color: {COR_CASTANHO} !important;
-    }}
-    div[data-baseweb="calendar"] svg {{
-        fill: {COR_CASTANHO} !important;
-    }}
-
     /* Ícones e Labels */
     button[kind="secondary"], div[data-baseweb="calendar"] button {{ color: {COR_CASTANHO} !important; }}
     .stRadio label {{ color: {COR_BRANCO} !important; font-weight: bold; }}
@@ -339,7 +320,7 @@ def pagina_home(df):
     <a href="{URL_LINKTREE}" target="_blank" style="text-decoration: none;">
         <div style="
             background-color: {COR_VERDE_CLARO}; 
-            color: white; 
+            color: {COR_BOTAO_TEXTO}; 
             line-height: 3.5em;
             height: 3.5em;
             border-radius: 12px; 
@@ -618,7 +599,7 @@ def pagina_admin_panel(df):
             st.divider()
             with st.expander("🗑️ Apagar Cliente"):
                 st.markdown(f"""
-                <div style="background-color: #ffcdd2; padding: 20px; border-radius: 10px; border: 3px solid #b71c1c; text-align: center;">
+                <div style="background-color: #ffcdd2; padding: 20px; border-radius: 10px; border: 3px solid #b71c1c; text-align: center; margin-left: auto; margin-right: auto; margin-bottom: 20px;">
                     <h3 style="color: #b71c1c !important;">⚠️ ATENÇÃO ⚠️</h3>
                     <p style="color: black; font-weight: bold;">Este cliente tem:</p>
                     <h1 style="color: #b71c1c !important; font-size: 3em !important;">{d['Pontos']} PONTOS</h1>
