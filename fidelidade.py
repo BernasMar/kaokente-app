@@ -501,7 +501,7 @@ def pagina_pontos(df):
     <div class="saldo-card">
         <div style="font-size: 1.1em; font-weight: bold; letter-spacing: 1px; color: {COR_BOTAO_FUNDO} !important;">SALDO DISPONÍVEL</div>
         <div style="color: {COR_BOTAO_FUNDO} !important; font-size: 4em; font-weight: 900;">{user['Pontos']}</div>
-        <div style="color: #888 !important;">pontos acumulados</div>
+        <div style="color: #f68625 !important;">pontos acumulados</div>
     </div>
     """, unsafe_allow_html=True)
     
