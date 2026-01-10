@@ -34,9 +34,10 @@ def get_image_base64(path):
 
 logo_b64 = get_image_base64("logo.png")
 
-# --- CSS (CORREÇÕES FINAIS DE ALINHAMENTO) ---
+# --- CSS (LIMPO E SIMPLIFICADO) ---
 st.markdown(f"""
     <style>
+    /* Ajuste do contentor principal */
     .block-container {{
         padding-top: 1rem;
         padding-bottom: 5rem;
@@ -48,32 +49,19 @@ st.markdown(f"""
     
     #MainMenu, header, footer {{ visibility: hidden; }}
 
+    /* TEXTOS */
     h1, h2, h3, h4 {{
         color: {COR_BRANCO} !important;
         font-weight: 800 !important;
         text-align: center !important;
-        margin-bottom: 20px !important;
     }}
     p, label, span, div {{
         color: {COR_BRANCO};
         font-family: sans-serif;
     }}
 
-    /* === BOTÕES CENTRADOS E LARGOS (FLEXBOX) === */
-    /* O container do botão agora usa flexbox para centrar */
-    div.stButton {{
-        width: 100% !important;
-        display: flex !important;
-        justify-content: center !important; /* Centra horizontalmente */
-        margin-top: 10px;
-        margin-bottom: 10px;
-    }}
-    
-    /* O botão em si estica até 100% da largura permitida */
-    div.stButton > button {{
-        width: 100% !important;
-        min-width: 300px !important; /* Largura mínima para garantir que não encolhe */
-        height: 3.8em !important;
+    /* === BOTÕES (ESTILO SIMPLES) === */
+    .stButton > button {{
         background-color: {COR_BOTAO_FUNDO} !important;
         color: {COR_BOTAO_TEXTO} !important;
         border: 2px solid {COR_BOTAO_TEXTO} !important;
@@ -81,70 +69,46 @@ st.markdown(f"""
         font-weight: 800 !important;
         font-size: 1.1em !important;
         text-transform: uppercase !important;
+        height: 3.5em !important;
         box-shadow: 0 4px 6px rgba(0,0,0,0.2) !important;
-        
-        /* Centralizar texto dentro do botão */
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        margin: 0 !important;
     }}
-    
-    div.stButton > button:active {{ transform: translateY(2px); }}
-    
-    /* Remove texto extra p dentro do botão */
-    div.stButton > button p {{
-        font-size: 1.1em !important;
-        font-weight: 800 !important;
-        margin: 0 !important;
-    }}
+    .stButton > button:active {{ transform: translateY(2px); }}
 
-    /* BOTÃO VOLTAR (Exceção: mais pequeno e à esquerda) */
-    .nav-btn div.stButton {{ 
-        width: auto !important; 
-        display: inline-block !important; 
-        justify-content: flex-start !important;
-    }}
-    .nav-btn div.stButton > button {{
-        width: auto !important;
-        min-width: 80px !important;
-        height: 2.5em !important;
-        font-size: 0.9em !important;
+    /* Botão Voltar (Branco) */
+    .nav-btn .stButton > button {{
         background-color: white !important;
         color: {COR_FUNDO} !important;
         border: none !important;
-        box-shadow: none !important;
+        height: 2.5em !important;
+        font-size: 0.9em !important;
     }}
 
-    /* === INPUTS & DROPDOWNS (CORREÇÃO DE LEGIBILIDADE) === */
+    /* === INPUTS & DROPDOWNS (CORREÇÃO DE CORES) === */
+    /* Garante que o texto é legível (castanho/preto) nos fundos brancos */
     .stTextInput > div > div > input, 
     .stNumberInput > div > div > input,
     .stDateInput > div > div > input {{
         background-color: white !important;
         color: {COR_CASTANHO} !important;
         border-radius: 8px;
-        border: none;
-        text-align: left !important;
     }}
     
-    /* Selectbox - Força Castanho */
+    /* Selectbox (Dropdowns) */
     div[data-baseweb="select"] > div {{
         background-color: white !important;
         color: {COR_CASTANHO} !important;
-        border-color: white !important;
     }}
     div[data-baseweb="select"] span {{ color: {COR_CASTANHO} !important; }}
-    div[data-baseweb="select"] svg {{ fill: {COR_CASTANHO} !important; color: {COR_CASTANHO} !important; }}
+    div[data-baseweb="select"] svg {{ fill: {COR_CASTANHO} !important; }}
+    
     ul[data-baseweb="menu"] {{ background-color: white !important; }}
     li[data-baseweb="option"] {{ color: {COR_CASTANHO} !important; background-color: white !important; }}
-    li[data-baseweb="option"]:hover, li[data-baseweb="option"][aria-selected="true"] {{
-        background-color: #fce8d4 !important;
-        color: {COR_CASTANHO} !important;
-    }}
     
+    /* Ícones e Labels */
     button[kind="secondary"], div[data-baseweb="calendar"] button {{ color: {COR_CASTANHO} !important; }}
     .stRadio label {{ color: {COR_BRANCO} !important; font-weight: bold; }}
 
+    /* Card Saldo */
     .saldo-card {{
         background-color: white;
         border-radius: 20px;
@@ -156,10 +120,10 @@ st.markdown(f"""
     }}
     .saldo-card div {{ color: {COR_CASTANHO} !important; }}
     
+    /* Imagens */
     div[data-testid="stImage"] {{
         display: flex;
         justify-content: center;
-        width: 100%;
     }}
     </style>
 """, unsafe_allow_html=True)
@@ -191,12 +155,10 @@ def navegar(destino):
 def calcular_idade(data_nascimento):
     if not data_nascimento: return 0
     if isinstance(data_nascimento, str):
-        # Tenta converter string para data se vier da BD
         try:
             data_nascimento = datetime.strptime(data_nascimento, "%Y-%m-%d").date()
         except:
             return 0
-    
     hoje = date.today()
     return hoje.year - data_nascimento.year - ((hoje.month, hoje.day) < (data_nascimento.month, data_nascimento.day))
 
@@ -224,48 +186,37 @@ def calcular_metricas(hist_str):
             except: continue
     return curr, prev
 
-# --- NOVA FUNÇÃO INTELIGENTE: ATUALIZAR IDADES E TIPOS ---
+# --- FUNÇÃO DE ATUALIZAÇÃO AUTOMÁTICA DE IDADE E TIPO ---
 def verificar_atualizacoes_automaticas(df):
-    """
-    Percorre a base de dados, recalcula a idade com base na data de nascimento
-    e atualiza o tipo de cliente (Estudante -> Normal) se passar dos 19 anos.
-    """
-    mudou_alguma_coisa = False
-    
+    mudou = False
     for index, row in df.iterrows():
         nasc_str = str(row['Nascimento'])
         if nasc_str and nasc_str != 'nan' and nasc_str != '':
             try:
-                # Converter string da BD para objeto data
                 data_nasc = datetime.strptime(nasc_str, "%Y-%m-%d").date()
                 nova_idade = calcular_idade(data_nasc)
                 
-                # 1. Atualizar Idade se mudou
+                # Atualiza Idade
                 if int(row['Idade']) != nova_idade:
                     df.at[index, 'Idade'] = nova_idade
-                    mudou_alguma_coisa = True
+                    mudou = True
                 
-                # 2. Atualizar Tipo (Estudante -> Normal) se passar dos 19
+                # Se passou dos 19 anos, deixa de ser estudante
                 if row['Tipo'] == 'Estudante' and nova_idade > 19:
                     df.at[index, 'Tipo'] = 'Normal'
-                    df.at[index, 'Historico'] = f"{datetime.now().strftime('%d/%m/%Y')} | Sistema: Passou a Normal (>19 anos)\n" + str(row['Historico'])
-                    mudou_alguma_coisa = True
-                    
-            except Exception as e:
-                pass # Ignora erros de data mal formatada
-                
-    return df, mudou_alguma_coisa
+                    df.at[index, 'Historico'] = f"{datetime.now().strftime('%d/%m/%Y')} | Sistema: Mudou para Normal (>19 anos)\n" + str(row['Historico'])
+                    mudou = True
+            except:
+                pass
+    return df, mudou
 
 def load_data():
     try:
         df = conn.read(worksheet="Sheet1", ttl=0)
         if df is None or df.empty: 
-            # Adicionei 'Nascimento' à lista de colunas
             return pd.DataFrame(columns=["Telemovel", "Nome", "Apelido", "Email", "Pontos", "Historico", "Password", "Tipo", "Idade", "Nascimento", "ComidaFavorita", "Localidade"])
         
         df['Telemovel'] = pd.to_numeric(df['Telemovel'], errors='coerce').fillna(0).astype(int).astype(str).replace('0', '')
-        
-        # Garantir que todas as colunas existem
         cols_str = ['Nome', 'Apelido', 'Email', 'Historico', 'Password', 'Tipo', 'ComidaFavorita', 'Localidade', 'Nascimento']
         for c in cols_str:
             if c not in df.columns: df[c] = ""
@@ -277,18 +228,12 @@ def load_data():
         if 'Idade' not in df.columns: df['Idade'] = 0
         df['Idade'] = pd.to_numeric(df['Idade'], errors='coerce').fillna(0).astype(int)
         
-        # --- EXECUTAR ATUALIZAÇÃO AUTOMÁTICA ---
-        # Filtra linhas vazias antes de processar
-        df = df[df['Telemovel'].str.len() > 3]
-        
-        # Verifica idades e tipos
+        # Executa a verificação de idades
         df, mudou = verificar_atualizacoes_automaticas(df)
-        
-        # Se houve mudanças automáticas (ex: alguém fez anos), grava logo
         if mudou:
             conn.update(worksheet="Sheet1", data=df)
             
-        return df
+        return df[df['Telemovel'].str.len() > 3]
     except: return pd.DataFrame()
 
 def save_data(df):
@@ -331,16 +276,17 @@ def pagina_home(df):
 
     st.write("") 
 
-    if st.button("🛵 ENCOMENDAR ON-LINE"):
+    # Botões Largos com use_container_width=True
+    if st.button("🛵 ENCOMENDAR ON-LINE", use_container_width=True):
         navegar("encomendas")
 
     st.write("")
 
     if user is None:
-        if st.button("👤 ENTRAR OU CRIAR CONTA"):
+        if st.button("👤 ENTRAR OU CRIAR CONTA", use_container_width=True):
             navegar("login_menu")
     else:
-        if st.button("🏆 OS MEUS PONTOS"):
+        if st.button("🏆 OS MEUS PONTOS", use_container_width=True):
             navegar("pontos")
 
     st.write("")
@@ -348,11 +294,10 @@ def pagina_home(df):
     st.markdown(f"""
     <a href="{URL_LINKTREE}" target="_blank" style="text-decoration: none;">
         <div style="
-            display: flex; justify-content: center; align-items: center;
             background-color: {COR_VERDE_CLARO}; 
             color: white; 
-            line-height: 3.8em;
-            height: 3.8em;
+            line-height: 3.5em;
+            height: 3.5em;
             border-radius: 12px; 
             text-align: center; 
             font-weight: 800; 
@@ -360,6 +305,9 @@ def pagina_home(df):
             border: 2px solid white; 
             box-shadow: 0 4px 6px rgba(0,0,0,0.2); 
             text-transform: uppercase; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
             width: 100%;
             margin-top: 10px;">
             🌲 LinkTree Kão Kente
@@ -398,12 +346,11 @@ def pagina_encomendas():
     st.markdown(f"""
     <a href="{URL_ENCOMENDAS}" target="_blank" style="text-decoration: none;">
         <div style="
-            display: flex; justify-content: center; align-items: center;
             background-color: {COR_BOTAO_FUNDO}; color: {COR_BOTAO_TEXTO}; 
-            line-height: 3.8em; height: 3.8em; border-radius: 12px; 
+            line-height: 3.5em; height: 3.5em; border-radius: 12px; 
             text-align: center; font-weight: 800; font-size: 1.1em;
             border: 2px solid {COR_BOTAO_TEXTO}; box-shadow: 0 4px 6px rgba(0,0,0,0.2); 
-            text-transform: uppercase; width: 100%;">
+            text-transform: uppercase; display: flex; align-items: center; justify-content: center; width: 100%;">
             ABRIR EMENTA COMPLETA ↗
         </div>
     </a>
@@ -432,7 +379,7 @@ def pagina_login_menu(df):
         st.markdown("<p style='text-align: center'>Podes entrar com Telemóvel ou E-mail.</p>", unsafe_allow_html=True)
         login_user = st.text_input("Telemóvel ou E-mail")
         login_pass = st.text_input("Palavra-passe", type="password")
-        if st.button("ENTRAR"):
+        if st.button("ENTRAR", use_container_width=True):
             input_limpo = login_user.strip()
             u_tel = df[(df['Telemovel'] == input_limpo) & (df['Password'] == login_pass)]
             u_mail = df[(df['Email'].str.lower() == input_limpo.lower()) & (df['Password'] == login_pass)]
@@ -454,10 +401,12 @@ def pagina_login_menu(df):
         r_pass1 = st.text_input("Palavra-passe", type="password", key="p1")
         r_pass2 = st.text_input("Repetir Palavra-passe", type="password", key="p2")
         
+        # NOVA LÓGICA DE DATA E IDADE
         r_nascimento = st.date_input("Data de Nascimento", min_value=date(1920, 1, 1), max_value=date.today(), format="DD/MM/YYYY")
         idade_calc = calcular_idade(r_nascimento)
         
         tipo_final = "Normal"
+        # Se for jovem (até 19), pergunta escola
         if idade_calc > 0 and idade_calc <= 19:
             resp_escola = st.radio("És aluno do Agrupamento de Escolas de Vila Viçosa?", ["Não", "Sim"], horizontal=True)
             if resp_escola == "Sim":
@@ -467,7 +416,7 @@ def pagina_login_menu(df):
         r_local = st.text_input("Localidade de Residência")
         
         st.write("")
-        if st.button("CRIAR CONTA AGORA"):
+        if st.button("CRIAR CONTA AGORA", use_container_width=True):
             if not (r_nome and r_tel and r_email and r_pass1):
                 st.error("Preenche os campos obrigatórios.")
             elif r_pass1 != r_pass2:
@@ -477,12 +426,11 @@ def pagina_login_menu(df):
             elif r_email in df['Email'].values and r_email != "":
                 st.error("Este e-mail já está registado.")
             else:
-                # GRAVAR TAMBÉM A DATA DE NASCIMENTO (String)
                 novo = pd.DataFrame([{
                     "Telemovel": str(r_tel), "Nome": r_nome, "Apelido": r_apelido,
                     "Email": r_email, "Pontos": 0, "Historico": f"Conta criada em {datetime.now().strftime('%d/%m/%Y')}",
                     "Password": r_pass1, "Tipo": tipo_final, "Idade": idade_calc, 
-                    "Nascimento": str(r_nascimento), # Guardar a data para cálculos futuros
+                    "Nascimento": str(r_nascimento),
                     "ComidaFavorita": r_comida, "Localidade": r_local
                 }])
                 df = pd.concat([df, novo], ignore_index=True)
@@ -575,7 +523,7 @@ def pagina_admin_panel(df):
             v = st.number_input("Valor €", step=0.5)
             pg = calcular_pontos_ganhos(v, d['Tipo'])
             st.write(f"Ganha: **{pg}** pts")
-            if st.button("Lançar"):
+            if st.button("Lançar", use_container_width=True):
                 idx = df[df['Telemovel']==sel].index[0]
                 df.at[idx, 'Pontos'] += pg
                 df.at[idx, 'Historico'] = f"{datetime.now().strftime('%d/%m/%Y %H:%M')} | Compra {v}€ | +{pg} pts\n" + str(df.at[idx, 'Historico'])
@@ -583,7 +531,7 @@ def pagina_admin_panel(df):
                 st.success("OK")
         with t2:
             pr = st.selectbox("Prémio", list(PREMIOS_PONTOS.keys()))
-            if st.button("Resgatar"):
+            if st.button("Resgatar", use_container_width=True):
                 custo = PREMIOS_PONTOS[pr]
                 if d['Pontos'] >= custo:
                     idx = df[df['Telemovel']==sel].index[0]
@@ -602,27 +550,25 @@ def pagina_admin_panel(df):
                 with c_c: em = st.text_input("Email", value=d['Email'])
                 with c_d: etel = st.text_input("Telemóvel", value=d['Telemovel'])
                 et = st.selectbox("Tipo", ["Normal", "Estudante"], index=0 if d['Tipo']=="Normal" else 1)
-                ei = st.number_input("Idade", value=int(d['Idade']) if d['Idade']!="" else 0)
-                ep = st.number_input("Pontos (Manual)", value=int(d['Pontos']))
-                eloc = st.text_input("Localidade", value=d['Localidade'])
-                efood = st.text_input("Comida Fav.", value=d['ComidaFavorita'])
                 
-                # Para editar Nascimento, precisamos converter string de volta para data
+                # Edit Nascimento
                 try:
                     data_atual = datetime.strptime(str(d['Nascimento']), "%Y-%m-%d").date()
                 except:
                     data_atual = date.today()
                 enasc = st.date_input("Data Nascimento", value=data_atual, format="DD/MM/YYYY")
-
-                if st.form_submit_button("💾 Guardar"):
+                
+                ep = st.number_input("Pontos (Manual)", value=int(d['Pontos']))
+                eloc = st.text_input("Localidade", value=d['Localidade'])
+                efood = st.text_input("Comida Fav.", value=d['ComidaFavorita'])
+                
+                if st.form_submit_button("💾 Guardar", use_container_width=True):
                     idx = df[df['Telemovel']==sel].index[0]
                     df.at[idx, 'Nome'] = en; df.at[idx, 'Apelido'] = ea; df.at[idx, 'Email'] = em; df.at[idx, 'Telemovel'] = etel
-                    df.at[idx, 'Tipo'] = et; df.at[idx, 'Idade'] = ei; df.at[idx, 'Pontos'] = ep; df.at[idx, 'Localidade'] = eloc; df.at[idx, 'ComidaFavorita'] = efood
-                    df.at[idx, 'Nascimento'] = str(enasc)
+                    df.at[idx, 'Tipo'] = et; df.at[idx, 'Nascimento'] = str(enasc); df.at[idx, 'Pontos'] = ep; df.at[idx, 'Localidade'] = eloc; df.at[idx, 'ComidaFavorita'] = efood
                     
-                    # Recalcular idade baseado na nova data
-                    nova_idade = calcular_idade(enasc)
-                    df.at[idx, 'Idade'] = nova_idade
+                    # Recalcular idade ao editar
+                    df.at[idx, 'Idade'] = calcular_idade(enasc)
                     
                     save_data(df); st.success("Guardado")
             st.divider()
@@ -634,7 +580,7 @@ def pagina_admin_panel(df):
                     <h1 style="color: #b71c1c !important; font-size: 3em !important;">{d['Pontos']} PONTOS</h1>
                     <p style="color: black;">MEMORIZE ESTE VALOR ANTES DE APAGAR!</p>
                 </div>""", unsafe_allow_html=True)
-                if st.button("CONFIRMAR: APAGAR PERMANENTEMENTE"):
+                if st.button("CONFIRMAR: APAGAR PERMANENTEMENTE", use_container_width=True):
                     idx = df[df['Telemovel']==sel].index[0]
                     df = df.drop(idx)
                     save_data(df)
