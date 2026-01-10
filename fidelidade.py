@@ -260,7 +260,7 @@ def load_data():
         if df is None or df.empty: 
             return pd.DataFrame(columns=["Telemovel", "Nome", "Apelido", "Email", "Pontos", "Historico", "Password", "Tipo", "Idade", "Nascimento", "ComidaFavorita", "Localidade"])
         
-        df['Telemovel'] = pd.to_numeric(df['Telemovel'], errors='coerce').fillna(0).astype(int).astype(str).replace('0', '')
+        df['Telemovel'] = df['Telemovel'].astype(str).replace('nan', '').str.replace(r'\.0$', '', regex=True)
         cols_str = ['Nome', 'Apelido', 'Email', 'Historico', 'Password', 'Tipo', 'ComidaFavorita', 'Localidade', 'Nascimento']
         for c in cols_str:
             if c not in df.columns: df[c] = ""
@@ -475,7 +475,7 @@ def pagina_login_menu(df):
                 st.error("Este e-mail já está registado.")
             else:
                 novo = pd.DataFrame([{
-                    "Telemovel": str(r_tel), "Nome": r_nome, "Apelido": r_apelido,
+                    "Telemovel": "'" + str(r_tel), "Nome": r_nome, "Apelido": r_apelido,
                     "Email": r_email, "Pontos": 0, "Historico": f"Conta criada em {datetime.now().strftime('%d/%m/%Y')}",
                     "Password": r_pass1, "Tipo": tipo_final, "Idade": idade_calc, 
                     "Nascimento": str(r_nascimento),
@@ -612,7 +612,7 @@ def pagina_admin_panel(df):
                 
                 if st.form_submit_button("💾 Guardar", use_container_width=True):
                     idx = df[df['Telemovel']==sel].index[0]
-                    df.at[idx, 'Nome'] = en; df.at[idx, 'Apelido'] = ea; df.at[idx, 'Email'] = em; df.at[idx, 'Telemovel'] = etel
+                    df.at[idx, 'Nome'] = en; df.at[idx, 'Apelido'] = ea; df.at[idx, 'Email'] = em; df.at[idx, 'Telemovel'] = "'" + etel
                     df.at[idx, 'Tipo'] = et; df.at[idx, 'Nascimento'] = str(enasc); df.at[idx, 'Pontos'] = ep; df.at[idx, 'Localidade'] = eloc; df.at[idx, 'ComidaFavorita'] = efood
                     
                     # Recalcular idade ao editar
