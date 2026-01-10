@@ -10,10 +10,10 @@ import streamlit.components.v1 as components
 st.set_page_config(page_title="Kão Kente", page_icon="logo.png", layout="wide")
 
 # --- CORES DA MARCA ---
-COR_FUNDO = "#946128"
-COR_CASTANHO = "#946128"
-COR_BOTAO_FUNDO = "#f68625"
-COR_BOTAO_TEXTO = "#9dddf9"
+COR_FUNDO = "#946128"       # Castanho (Fundo do site)
+COR_CASTANHO = "#946128"    # Castanho (Texto)
+COR_BOTAO_FUNDO = "#f68625" # Laranja
+COR_BOTAO_TEXTO = "#9dddf9" # Azul Claro (Texto e Borda)
 COR_VERDE_CLARO = "#8db842"
 COR_VERDE_ESCURO = "#0d974d"
 COR_BRANCO = "#ffffff"
@@ -34,10 +34,10 @@ def get_image_base64(path):
 
 logo_b64 = get_image_base64("logo.png")
 
-# --- CSS (CORREÇÕES VISUAIS DE FUNDO E SELECTBOX) ---
-# Nota: Usamos {{ }} para CSS porque estamos dentro de uma f-string Python
+# --- CSS (SOLUÇÃO DEFINITIVA) ---
 st.markdown(f"""
     <style>
+    /* Contentor Principal */
     .block-container {{
         padding-top: 1rem;
         padding-bottom: 5rem;
@@ -49,6 +49,7 @@ st.markdown(f"""
     
     #MainMenu, header, footer {{ visibility: hidden; }}
 
+    /* TÍTULOS (Brancos em fundo castanho) */
     h1, h2, h3, h4 {{
         color: {COR_BRANCO} !important;
         font-weight: 800 !important;
@@ -56,27 +57,24 @@ st.markdown(f"""
         margin-bottom: 20px !important;
     }}
     
-    /* Texto geral branco (mas com cuidado para não estragar inputs) */
-    p, label, span, div {{
-        color: {COR_BRANCO};
+    /* TEXTO NORMAL (Apenas em parágrafos diretos para não afetar inputs) */
+    .stMarkdown p {{
+        color: {COR_BRANCO} !important;
         font-family: sans-serif;
     }}
 
-    /* === BOTÕES LARANJA (CORREÇÃO DE LARGURA) === */
-    /* Força o contentor do botão a ter 100% de largura */
+    /* === BOTÕES LARGURA TOTAL (FORÇA BRUTA) === */
+    
+    /* O contentor do botão */
     div.stButton {{
-        width: 100% !important;
+        width: 100% !important; 
         padding: 0 !important;
-        margin-top: 10px;
-        margin-bottom: 10px;
     }}
     
-    /* Força o botão em si a preencher o contentor */
+    /* O botão em si */
     div.stButton > button {{
         width: 100% !important;
-        display: flex !important;
-        justify-content: center !important;
-        align-items: center !important;
+        display: block !important; /* Garante bloco */
         height: 3.8em !important;
         background-color: {COR_BOTAO_FUNDO} !important;
         color: {COR_BOTAO_TEXTO} !important;
@@ -86,19 +84,18 @@ st.markdown(f"""
         font-size: 1.1em !important;
         text-transform: uppercase !important;
         box-shadow: 0 4px 6px rgba(0,0,0,0.2) !important;
-        margin: 0 !important;
+        margin: 5px 0 !important; /* Margem vertical apenas */
     }}
     
     div.stButton > button:active {{ transform: translateY(2px); }}
     
-    /* Remove texto extra dentro do botão que atrapalha o alinhamento */
+    /* Remove texto extra dentro do botão */
     div.stButton > button p {{
-        color: {COR_BOTAO_TEXTO} !important;
         font-size: 1.1em !important;
         font-weight: 800 !important;
     }}
 
-    /* BOTÃO DE VOLTAR (Exceção: mais pequeno e branco) */
+    /* BOTÃO DE VOLTAR (Exceção) */
     .nav-btn div.stButton {{ width: auto !important; display: inline-block !important; }}
     .nav-btn div.stButton > button {{
         width: auto !important;
@@ -115,66 +112,43 @@ st.markdown(f"""
         font-size: 0.9em !important;
     }}
 
-    /* === INPUTS DE TEXTO GERAIS === */
-    .stTextInput > div > div > input, 
-    .stNumberInput > div > div > input,
-    .stDateInput > div > div > input {{
+    /* === INPUTS & DROPDOWNS (CORREÇÃO DE LEGIBILIDADE) === */
+    /* Removemos a regra global de cor branca. Agora forçamos escuro nos inputs */
+    
+    .stTextInput input, .stNumberInput input, .stDateInput input {{
+        color: black !important;
         background-color: white !important;
-        color: {COR_CASTANHO} !important;
-        border-radius: 8px;
-        border: none;
-        text-align: left !important;
     }}
     
-    /* === CORREÇÃO CRÍTICA: SELECTBOX (BRANCO NO BRANCO) === */
-    /* Força bruta para garantir que tudo dentro do selectbox é visível */
-    
-    /* 1. Caixa Principal */
+    /* Selectbox (Dropdowns) */
     div[data-baseweb="select"] > div {{
         background-color: white !important;
-        border-color: white !important;
+        color: black !important;
     }}
     
-    /* 2. Texto Selecionado */
+    /* Texto dentro do Selectbox */
     div[data-baseweb="select"] span {{
-        color: {COR_CASTANHO} !important;
-        -webkit-text-fill-color: {COR_CASTANHO} !important;
+        color: black !important;
     }}
     
-    /* 3. Ícone da Seta */
+    /* Menu de Opções (Dropdown aberto) */
+    ul[data-baseweb="menu"] li {{
+        background-color: white !important;
+        color: black !important;
+    }}
+    
+    /* Seta do Dropdown */
     div[data-baseweb="select"] svg {{
-        fill: {COR_CASTANHO} !important;
-        color: {COR_CASTANHO} !important;
+        fill: black !important;
     }}
-    
-    /* 4. Menu Dropdown (Lista) */
-    ul[data-baseweb="menu"] {{
-        background-color: white !important;
-    }}
-    
-    /* 5. Opções da Lista */
-    li[data-baseweb="option"] {{
-        color: {COR_CASTANHO} !important;
-        background-color: white !important;
-    }}
-    li[data-baseweb="option"] span {{
-        color: {COR_CASTANHO} !important;
-    }}
-    
-    /* 6. Opção Focada/Selecionada */
-    li[data-baseweb="option"]:hover, 
-    li[data-baseweb="option"][aria-selected="true"] {{
-        background-color: #fce8d4 !important;
-        color: {COR_CASTANHO} !important;
-    }}
-    
-    /* Ícones genéricos dentro de inputs (calendário, +/-) */
-    button[kind="secondary"], div[data-baseweb="calendar"] button {{ 
-        color: {COR_CASTANHO} !important; 
-    }}
-    
-    .stRadio label {{ color: {COR_BRANCO} !important; font-weight: bold; }}
 
+    /* Etiquetas (Labels) dos inputs - Brancas para contrastar com o fundo castanho */
+    label {{
+        color: {COR_BRANCO} !important;
+        font-weight: bold !important;
+    }}
+
+    /* Card de Saldo */
     .saldo-card {{
         background-color: white;
         border-radius: 20px;
@@ -186,6 +160,7 @@ st.markdown(f"""
     }}
     .saldo-card div {{ color: {COR_CASTANHO} !important; }}
     
+    /* Imagens */
     div[data-testid="stImage"] {{
         display: flex;
         justify-content: center;
@@ -304,11 +279,13 @@ def pagina_home(df):
 
     st.write("") 
 
+    # Botão 1
     if st.button("🛵 ENCOMENDAR ON-LINE"):
         navegar("encomendas")
 
     st.write("")
 
+    # Botão 2
     if user is None:
         if st.button("👤 ENTRAR OU CRIAR CONTA"):
             navegar("login_menu")
@@ -318,6 +295,7 @@ def pagina_home(df):
 
     st.write("")
 
+    # Botão 3 (HTML)
     st.markdown(f"""
     <a href="{URL_LINKTREE}" target="_blank" style="text-decoration: none;">
         <div style="
@@ -475,7 +453,7 @@ def pagina_pontos(df):
     
     st.markdown(f"""
     <div class="saldo-card">
-        <div style="font-size: 1.1em; font-weight: bold; letter-spacing: 1px;">SALDO DISPONÍVEL</div>
+        <div style="font-size: 1.1em; font-weight: bold; letter-spacing: 1px; color: {COR_CASTANHO} !important;">SALDO DISPONÍVEL</div>
         <div style="color: {COR_BOTAO_FUNDO} !important; font-size: 4em; font-weight: 900;">{user['Pontos']}</div>
         <div style="color: #888 !important;">pontos acumulados</div>
     </div>
