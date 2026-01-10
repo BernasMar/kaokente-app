@@ -54,19 +54,24 @@ st.markdown(f"""
         text-align: center !important;
         margin-bottom: 20px !important;
     }}
+    
+    /* Regra geral de texto (Cuidado: isto afeta tudo, por isso corrigimos o selectbox abaixo) */
     p, label, span, div {{
         color: {COR_BRANCO};
         font-family: sans-serif;
     }}
 
-    /* BOTÕES LARANJA */
+    /* === CORREÇÃO BOTÕES LARANJA (LARGURA TOTAL) === */
+    /* Força o contentor do botão a ter largura total */
+    div[data-testid="stButton"] {{
+        width: 100% !important;
+    }}
+    
     .stButton {{
         width: 100% !important;
         padding: 0 !important;
         margin-top: 10px;
         margin-bottom: 10px;
-        display: flex;
-        justify-content: center;
     }}
     
     .stButton > button {{
@@ -110,40 +115,41 @@ st.markdown(f"""
         text-align: left !important;
     }}
     
-    /* --- CORREÇÃO CRÍTICA PARA SELECTBOX (MENUS DE OPÇÕES) --- */
+    /* --- CORREÇÃO CRÍTICA PARA SELECTBOX (BRANCO NO BRANCO) --- */
     
-    /* 1. A caixa principal do Selectbox (antes de clicar) */
-    .stSelectbox div[data-baseweb="select"] > div {{
+    /* 1. Caixa principal e texto selecionado */
+    div[data-baseweb="select"] > div {{
         background-color: white !important;
+        color: {COR_CASTANHO} !important;
         border-color: white !important;
+    }}
+    
+    /* 2. Forçar a cor do texto dentro do select para castanho */
+    div[data-baseweb="select"] span {{
         color: {COR_CASTANHO} !important;
     }}
     
-    /* 2. O texto dentro da caixa principal */
-    .stSelectbox div[data-baseweb="select"] span {{
-        color: {COR_CASTANHO} !important;
-    }}
-    
-    /* 3. A setinha (ícone SVG) */
-    .stSelectbox div[data-baseweb="select"] svg {{
+    /* 3. Forçar a cor do ícone (seta) para castanho */
+    div[data-baseweb="select"] svg {{
         fill: {COR_CASTANHO} !important;
         color: {COR_CASTANHO} !important;
     }}
     
-    /* 4. O MENU DROPDOWN (A lista que abre) */
+    /* 4. Menu dropdown (lista de opções) */
     ul[data-baseweb="menu"] {{
         background-color: white !important;
     }}
     
-    /* 5. As opções dentro da lista */
+    /* 5. Opções individuais */
     li[data-baseweb="option"] {{
-        color: {COR_CASTANHO} !important; /* Texto castanho */
-        background-color: white !important; /* Fundo branco */
+        color: {COR_CASTANHO} !important;
+        background-color: white !important;
     }}
     
-    /* 6. Opção selecionada ou hover */
-    li[data-baseweb="option"]:hover, li[data-baseweb="option"][aria-selected="true"] {{
-        background-color: #fce8d4 !important; /* Fundo laranja claro */
+    /* 6. Opção selecionada/hover na lista */
+    li[data-baseweb="option"]:hover, 
+    li[data-baseweb="option"][aria-selected="true"] {{
+        background-color: #fce8d4 !important;
         color: {COR_CASTANHO} !important;
     }}
     
