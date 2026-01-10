@@ -631,9 +631,9 @@ def pagina_admin_panel(df):
                     st.success("Apagado.")
                     st.rerun()
         with t4:
-            st.warning("Área Restrita")
-            pass_master = st.text_input("Password Mestra", type="password")
-            if pass_master == "masterkk": st.dataframe(df)
+            st.warning("Esta área é restrita. O que andas aqui a fazer, curioso?")
+            pass_master = st.text_input("Palavra-passe", type="password")
+            if pass_master == "noronha": st.dataframe(df)
 
 # --- MAIN LOOP ---
 df = load_data()
