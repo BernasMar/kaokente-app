@@ -34,7 +34,7 @@ def get_image_base64(path):
 
 logo_b64 = get_image_base64("logo.png")
 
-# --- CSS (LIMPO E SIMPLIFICADO) ---
+# --- CSS (COM A CORREÇÃO DE TEXTO NOS BOTÕES) ---
 st.markdown(f"""
     <style>
     /* Ajuste do contentor principal */
@@ -49,7 +49,7 @@ st.markdown(f"""
     
     #MainMenu, header, footer {{ visibility: hidden; }}
 
-    /* TEXTOS */
+    /* TEXTOS GERAIS */
     h1, h2, h3, h4 {{
         color: {COR_BRANCO} !important;
         font-weight: 800 !important;
@@ -60,7 +60,7 @@ st.markdown(f"""
         font-family: sans-serif;
     }}
 
-    /* === BOTÕES (ESTILO SIMPLES) === */
+    /* === BOTÕES (ESTILO SIMPLES + LARGURA TOTAL) === */
     .stButton > button {{
         background-color: {COR_BOTAO_FUNDO} !important;
         color: {COR_BOTAO_TEXTO} !important;
@@ -73,8 +73,15 @@ st.markdown(f"""
         box-shadow: 0 4px 6px rgba(0,0,0,0.2) !important;
     }}
     .stButton > button:active {{ transform: translateY(2px); }}
+    
+    /* CORREÇÃO CRÍTICA: Força o texto dentro do botão a ser AZUL e NEGRITO */
+    /* Isto sobrepõe a regra global que pintava tudo de branco */
+    .stButton > button p {{
+        color: {COR_BOTAO_TEXTO} !important;
+        font-weight: 800 !important;
+    }}
 
-    /* Botão Voltar (Branco) */
+    /* Botão Voltar (Branco) - Exceção */
     .nav-btn .stButton > button {{
         background-color: white !important;
         color: {COR_FUNDO} !important;
@@ -82,9 +89,11 @@ st.markdown(f"""
         height: 2.5em !important;
         font-size: 0.9em !important;
     }}
+    .nav-btn .stButton > button p {{
+        color: {COR_FUNDO} !important;
+    }}
 
-    /* === INPUTS & DROPDOWNS (CORREÇÃO DE CORES) === */
-    /* Garante que o texto é legível (castanho/preto) nos fundos brancos */
+    /* === INPUTS & DROPDOWNS (PRESERVAR LEGIBILIDADE) === */
     .stTextInput > div > div > input, 
     .stNumberInput > div > div > input,
     .stDateInput > div > div > input {{
