@@ -34,10 +34,10 @@ def get_image_base64(path):
 
 logo_b64 = get_image_base64("logo.png")
 
-# --- CSS (CORREÇÕES FINAIS) ---
+# --- CSS (CORREÇÕES VISUAIS DE FUNDO E SELECTBOX) ---
+# Nota: Usamos {{ }} para CSS porque estamos dentro de uma f-string Python
 st.markdown(f"""
     <style>
-    /* Contentor Principal */
     .block-container {{
         padding-top: 1rem;
         padding-bottom: 5rem;
@@ -49,29 +49,29 @@ st.markdown(f"""
     
     #MainMenu, header, footer {{ visibility: hidden; }}
 
-    /* TEXTOS GERAIS */
     h1, h2, h3, h4 {{
         color: {COR_BRANCO} !important;
         font-weight: 800 !important;
         text-align: center !important;
         margin-bottom: 20px !important;
     }}
+    
+    /* Texto geral branco (mas com cuidado para não estragar inputs) */
     p, label, span, div {{
         color: {COR_BRANCO};
         font-family: sans-serif;
     }}
 
-    /* === CORREÇÃO CRÍTICA: BOTÕES LARGURA TOTAL === */
-    
-    /* 1. Forçar o contentor do botão a ocupar 100% */
+    /* === BOTÕES LARANJA (CORREÇÃO DE LARGURA) === */
+    /* Força o contentor do botão a ter 100% de largura */
     div.stButton {{
         width: 100% !important;
         padding: 0 !important;
-        margin-top: 10px !important;
-        margin-bottom: 10px !important;
+        margin-top: 10px;
+        margin-bottom: 10px;
     }}
     
-    /* 2. Forçar o botão em si a ocupar 100% */
+    /* Força o botão em si a preencher o contentor */
     div.stButton > button {{
         width: 100% !important;
         display: flex !important;
@@ -86,17 +86,19 @@ st.markdown(f"""
         font-size: 1.1em !important;
         text-transform: uppercase !important;
         box-shadow: 0 4px 6px rgba(0,0,0,0.2) !important;
+        margin: 0 !important;
     }}
     
     div.stButton > button:active {{ transform: translateY(2px); }}
     
-    /* Remove espaçamentos internos estranhos */
+    /* Remove texto extra dentro do botão que atrapalha o alinhamento */
     div.stButton > button p {{
+        color: {COR_BOTAO_TEXTO} !important;
         font-size: 1.1em !important;
         font-weight: 800 !important;
     }}
 
-    /* Botão VOLTAR (Exceção: mais pequeno) */
+    /* BOTÃO DE VOLTAR (Exceção: mais pequeno e branco) */
     .nav-btn div.stButton {{ width: auto !important; display: inline-block !important; }}
     .nav-btn div.stButton > button {{
         width: auto !important;
@@ -107,36 +109,13 @@ st.markdown(f"""
         color: {COR_FUNDO} !important;
         border: none !important;
         box-shadow: none !important;
-        margin: 0 !important;
+    }}
+    .nav-btn div.stButton > button p {{
+        color: {COR_FUNDO} !important;
+        font-size: 0.9em !important;
     }}
 
-    /* === CORREÇÃO CRÍTICA: SELECTBOX (Branco no Branco) === */
-    /* A tua regra global 'div { color: white }' estava a matar o selectbox.
-       Aqui forçamos tudo dentro do selectbox a ser castanho. */
-       
-    /* Caixa Principal e Menu Dropdown */
-    div[data-baseweb="select"] > div, 
-    div[data-baseweb="popover"] > div,
-    ul[data-baseweb="menu"] {{
-        background-color: white !important;
-    }}
-    
-    /* TEXTO e ÍCONES dentro do Selectbox -> CASTANHO OBRIGATÓRIO */
-    div[data-baseweb="select"] span, 
-    div[data-baseweb="select"] svg,
-    div[data-baseweb="select"] p,
-    li[data-baseweb="option"] {{
-        color: {COR_CASTANHO} !important;
-        fill: {COR_CASTANHO} !important; /* Para as setas SVG */
-        font-weight: bold !important;
-    }}
-    
-    /* Opção selecionada no menu */
-    li[data-baseweb="option"][aria-selected="true"] {{
-        background-color: #fce8d4 !important;
-    }}
-
-    /* === INPUTS DE TEXTO (Nome, Email, etc) === */
+    /* === INPUTS DE TEXTO GERAIS === */
     .stTextInput > div > div > input, 
     .stNumberInput > div > div > input,
     .stDateInput > div > div > input {{
@@ -147,15 +126,55 @@ st.markdown(f"""
         text-align: left !important;
     }}
     
-    /* Ícones de calendário/número */
+    /* === CORREÇÃO CRÍTICA: SELECTBOX (BRANCO NO BRANCO) === */
+    /* Força bruta para garantir que tudo dentro do selectbox é visível */
+    
+    /* 1. Caixa Principal */
+    div[data-baseweb="select"] > div {{
+        background-color: white !important;
+        border-color: white !important;
+    }}
+    
+    /* 2. Texto Selecionado */
+    div[data-baseweb="select"] span {{
+        color: {COR_CASTANHO} !important;
+        -webkit-text-fill-color: {COR_CASTANHO} !important;
+    }}
+    
+    /* 3. Ícone da Seta */
+    div[data-baseweb="select"] svg {{
+        fill: {COR_CASTANHO} !important;
+        color: {COR_CASTANHO} !important;
+    }}
+    
+    /* 4. Menu Dropdown (Lista) */
+    ul[data-baseweb="menu"] {{
+        background-color: white !important;
+    }}
+    
+    /* 5. Opções da Lista */
+    li[data-baseweb="option"] {{
+        color: {COR_CASTANHO} !important;
+        background-color: white !important;
+    }}
+    li[data-baseweb="option"] span {{
+        color: {COR_CASTANHO} !important;
+    }}
+    
+    /* 6. Opção Focada/Selecionada */
+    li[data-baseweb="option"]:hover, 
+    li[data-baseweb="option"][aria-selected="true"] {{
+        background-color: #fce8d4 !important;
+        color: {COR_CASTANHO} !important;
+    }}
+    
+    /* Ícones genéricos dentro de inputs (calendário, +/-) */
     button[kind="secondary"], div[data-baseweb="calendar"] button {{ 
         color: {COR_CASTANHO} !important; 
     }}
     
-    /* Radio Buttons */
     .stRadio label {{ color: {COR_BRANCO} !important; font-weight: bold; }}
 
-    /* Card de Saldo */
     .saldo-card {{
         background-color: white;
         border-radius: 20px;
@@ -165,8 +184,8 @@ st.markdown(f"""
         margin-bottom: 20px;
         box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     }}
+    .saldo-card div {{ color: {COR_CASTANHO} !important; }}
     
-    /* Imagens centradas */
     div[data-testid="stImage"] {{
         display: flex;
         justify-content: center;
@@ -456,9 +475,9 @@ def pagina_pontos(df):
     
     st.markdown(f"""
     <div class="saldo-card">
-        <div style="color: {COR_CASTANHO}; font-size: 1.1em; font-weight: bold; letter-spacing: 1px;">SALDO DISPONÍVEL</div>
-        <div style="color: {COR_BOTAO_FUNDO}; font-size: 4em; font-weight: 900;">{user['Pontos']}</div>
-        <div style="color: #888;">pontos acumulados</div>
+        <div style="font-size: 1.1em; font-weight: bold; letter-spacing: 1px;">SALDO DISPONÍVEL</div>
+        <div style="color: {COR_BOTAO_FUNDO} !important; font-size: 4em; font-weight: 900;">{user['Pontos']}</div>
+        <div style="color: #888 !important;">pontos acumulados</div>
     </div>
     """, unsafe_allow_html=True)
     
