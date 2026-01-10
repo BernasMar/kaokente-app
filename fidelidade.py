@@ -557,8 +557,8 @@ def pagina_admin_panel(df):
         st.info(f"**{d['Nome']} {d['Apelido']}** | {d['Tipo']} | {d['Idade']} Anos")
         c1, c2, c3 = st.columns(3)
         c1.metric("Pontos", d['Pontos'])
-        c2.metric("Mês Atual", f"{ga}€")
-        c3.metric("Mês Pass.", f"{gb}€")
+        c2.metric("Mês actual", f"{ga}€")
+        c3.metric("Mês passado", f"{gb}€")
         
         st.markdown("""<style>.stTabs [data-baseweb="tab-list"] button {color: white !important;}</style>""", unsafe_allow_html=True)
         t1, t2, t3, t4 = st.tabs(["💰 Lançar", "🎁 Resgatar", "✏️ Editar", "📊 Tabela"])
@@ -566,7 +566,7 @@ def pagina_admin_panel(df):
         with t1:
             v = st.number_input("Valor €", step=0.5)
             pg = calcular_pontos_ganhos(v, d['Tipo'])
-            st.write(f"Ganha: **{pg}** pts")
+            st.write(f"Ganha: **{pg}** pontos")
             if st.button("Lançar", use_container_width=True):
                 idx = df[df['Telemovel']==sel].index[0]
                 df.at[idx, 'Pontos'] += pg
@@ -619,7 +619,7 @@ def pagina_admin_panel(df):
             with st.expander("🗑️ Apagar Cliente"):
                 st.markdown(f"""
                 <div style="background-color: #ffcdd2; padding: 20px; border-radius: 10px; border: 3px solid #b71c1c; text-align: center;">
-                    <h3 style="color: #b71c1c !important;">⚠️ ATENÇÃO ⚠️</h3>
+                    <h3 style="color: #b71c1c !important;">⚠️  ATENÇÃO ⚠️</h3>
                     <p style="color: black; font-weight: bold;">Este cliente tem:</p>
                     <h1 style="color: #b71c1c !important; font-size: 3em !important;">{d['Pontos']} PONTOS</h1>
                     <p style="color: black;">MEMORIZE ESTE VALOR ANTES DE APAGAR!</p>
@@ -631,7 +631,7 @@ def pagina_admin_panel(df):
                     st.success("Apagado.")
                     st.rerun()
         with t4:
-            st.warning("Esta área é restrita. O que andas aqui a fazer, curioso?")
+            st.warning("Esta área é restrita. O que andas a fazer aqui?")
             pass_master = st.text_input("Palavra-passe", type="password")
             if pass_master == "noronha": st.dataframe(df)
 
