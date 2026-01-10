@@ -34,7 +34,7 @@ def get_image_base64(path):
 
 logo_b64 = get_image_base64("logo.png")
 
-# --- CSS (CORREÇÕES FINAIS: CALENDÁRIO + BOTÕES + MENUS) ---
+# --- CSS (CORREÇÃO DE DROPDOWNS E BOTÕES) ---
 st.markdown(f"""
     <style>
     /* Ajuste do contentor principal */
@@ -60,7 +60,7 @@ st.markdown(f"""
         font-family: sans-serif;
     }}
 
-    /* === BOTÕES (LARGURA TOTAL + TEXTO AZUL) === */
+    /* === BOTÕES (ESTILO SIMPLES) === */
     .stButton > button {{
         background-color: {COR_BOTAO_FUNDO} !important;
         color: {COR_BOTAO_TEXTO} !important;
@@ -92,7 +92,7 @@ st.markdown(f"""
         color: {COR_FUNDO} !important;
     }}
 
-    /* === INPUTS & DROPDOWNS === */
+    /* === INPUTS DE TEXTO === */
     .stTextInput > div > div > input, 
     .stNumberInput > div > div > input,
     .stDateInput > div > div > input {{
@@ -100,47 +100,52 @@ st.markdown(f"""
         color: {COR_CASTANHO} !important;
         border-radius: 8px;
     }}
+
+    /* === CORREÇÃO "NUCLEAR" PARA SELECTBOX (DROPDOWNS) === */
+    /* Força TUDO (*) dentro do seletor a ser castanho */
+    div[data-baseweb="select"] * {{
+        color: {COR_CASTANHO} !important;
+    }}
     
-    /* Selectbox (Dropdowns) */
+    /* Caixa principal do Selectbox */
     div[data-baseweb="select"] > div {{
         background-color: white !important;
-        color: {COR_CASTANHO} !important;
-    }}
-    div[data-baseweb="select"] span {{ color: {COR_CASTANHO} !important; }}
-    div[data-baseweb="select"] svg {{ fill: {COR_CASTANHO} !important; }}
-    
-    ul[data-baseweb="menu"] {{ background-color: white !important; }}
-    li[data-baseweb="option"] {{ color: {COR_CASTANHO} !important; background-color: white !important; }}
-    
-    /* === CORREÇÃO CALENDÁRIO (DATE PICKER) === */
-    /* Fundo do calendário */
-    div[data-baseweb="calendar"] {{
-        background-color: white !important;
+        border-color: white !important;
     }}
     
-    /* Todo o texto dentro do calendário (Mês, Dias, Ano) */
-    div[data-baseweb="calendar"] div {{
-        color: {COR_CASTANHO} !important;
-    }}
-    
-    /* Botões dos dias */
-    div[data-baseweb="calendar"] button {{
-        color: {COR_CASTANHO} !important;
-        background-color: white !important;
-    }}
-    
-    /* Setas de navegação */
-    div[data-baseweb="calendar"] svg {{
+    /* Ícone da seta SVG */
+    div[data-baseweb="select"] svg {{
         fill: {COR_CASTANHO} !important;
     }}
     
-    /* Dia Selecionado (Laranja com texto azul ou branco) */
-    div[data-baseweb="calendar"] button[aria-selected="true"] {{
-        background-color: {COR_BOTAO_FUNDO} !important;
-        color: white !important;
+    /* Menu Pop-up (A lista de opções) */
+    ul[data-baseweb="menu"] {{
+        background-color: white !important;
     }}
-    div[data-baseweb="calendar"] button[aria-selected="true"]:hover {{
-        background-color: {COR_BOTAO_FUNDO} !important;
+    
+    /* Cada opção da lista */
+    li[data-baseweb="option"] {{
+        background-color: white !important;
+        color: {COR_CASTANHO} !important;
+    }}
+    
+    /* Hover na lista */
+    li[data-baseweb="option"]:hover {{
+        background-color: #fce8d4 !important;
+    }}
+    
+    /* === CORREÇÃO CALENDÁRIO === */
+    div[data-baseweb="calendar"] {{
+        background-color: white !important;
+    }}
+    div[data-baseweb="calendar"] button {{
+        color: {COR_CASTANHO} !important;
+    }}
+    div[data-baseweb="calendar"] div {{
+        color: {COR_CASTANHO} !important;
+    }}
+    div[data-baseweb="calendar"] svg {{
+        fill: {COR_CASTANHO} !important;
     }}
 
     /* Ícones e Labels */
