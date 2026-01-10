@@ -335,7 +335,7 @@ def pagina_home(df):
 
     st.write("")
 
-    st.markdown(f"""
+    st.markdown(f"""</h3>
     <a href="{URL_LINKTREE}" target="_blank" style="text-decoration: none;">
         <div style="
             background-color: {COR_VERDE_CLARO}; 
@@ -572,7 +572,7 @@ def pagina_admin_panel(df):
                 df.at[idx, 'Pontos'] += pg
                 df.at[idx, 'Historico'] = f"{datetime.now().strftime('%d/%m/%Y %H:%M')} | Compra {v}€ | +{pg} pts\n" + str(df.at[idx, 'Historico'])
                 save_data(df)
-                st.success("OK")
+                st.success("Pontos atribuídos com sucesso")
         with t2:
             pr = st.selectbox("Prémio", list(PREMIOS_PONTOS.keys()))
             if st.button("Resgatar", use_container_width=True):
@@ -582,8 +582,8 @@ def pagina_admin_panel(df):
                     df.at[idx, 'Pontos'] -= custo
                     df.at[idx, 'Historico'] = f"{datetime.now().strftime('%d/%m/%Y %H:%M')} | Resgate {pr} | -{custo} pts\n" + str(df.at[idx, 'Historico'])
                     save_data(df)
-                    st.success("OK")
-                else: st.error("Falta saldo")
+                    st.success("Produto resgatado com sucesso")
+                else: st.error("Saldo insuficiente")
         with t3:
             st.markdown("### Editar Dados")
             with st.form("edit"):
