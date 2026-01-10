@@ -424,7 +424,7 @@ def pagina_login_menu(df):
     
     with tab_login:
         st.write("")
-        st.markdown("<p style='text-align: center'>Podes entrar com telemóvel ou e-mail.</p>", unsafe_allow_html=True)
+        st.markdown("<p style='text-align: center'>Podes entrar com telemóvel ou e-mail</p>", unsafe_allow_html=True)
         login_user = st.text_input("Telemóvel ou e-mail")
         login_pass = st.text_input("Palavra-passe", type="password")
         if st.button("ENTRAR", use_container_width=True):
@@ -499,7 +499,7 @@ def pagina_pontos(df):
     
     st.markdown(f"""
     <div class="saldo-card">
-        <div style="font-size: 1.1em; font-weight: bold; letter-spacing: 1px; color: {COR_CASTANHO} !important;">SALDO DISPONÍVEL</div>
+        <div style="font-size: 1.1em; font-weight: bold; letter-spacing: 1px; color: {COR_BOTAO_FUNDO} !important;">SALDO DISPONÍVEL</div>
         <div style="color: {COR_BOTAO_FUNDO} !important; font-size: 4em; font-weight: 900;">{user['Pontos']}</div>
         <div style="color: #888 !important;">pontos acumulados</div>
     </div>
