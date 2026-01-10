@@ -335,7 +335,7 @@ def pagina_home(df):
 
     st.write("")
 
-    st.markdown(f"""</h3>
+    st.markdown(f"""</p>
     <a href="{URL_LINKTREE}" target="_blank" style="text-decoration: none;">
         <div style="
             background-color: {COR_VERDE_CLARO}; 
