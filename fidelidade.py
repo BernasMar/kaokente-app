@@ -34,9 +34,10 @@ def get_image_base64(path):
 
 logo_b64 = get_image_base64("logo.png")
 
-# --- CSS (CORREÇÕES VISUAIS DE FUNDO E SELECTBOX) ---
+# --- CSS (CORREÇÕES FINAIS) ---
 st.markdown(f"""
     <style>
+    /* Contentor Principal */
     .block-container {{
         padding-top: 1rem;
         padding-bottom: 5rem;
@@ -48,35 +49,34 @@ st.markdown(f"""
     
     #MainMenu, header, footer {{ visibility: hidden; }}
 
+    /* TEXTOS GERAIS */
     h1, h2, h3, h4 {{
         color: {COR_BRANCO} !important;
         font-weight: 800 !important;
         text-align: center !important;
         margin-bottom: 20px !important;
     }}
-    
-    /* Regra geral de texto (Cuidado: isto afeta tudo, por isso corrigimos o selectbox abaixo) */
     p, label, span, div {{
         color: {COR_BRANCO};
         font-family: sans-serif;
     }}
 
-    /* === CORREÇÃO BOTÕES LARANJA (LARGURA TOTAL) === */
-    /* Força o contentor do botão a ter largura total */
-    div[data-testid="stButton"] {{
-        width: 100% !important;
-    }}
+    /* === CORREÇÃO CRÍTICA: BOTÕES LARGURA TOTAL === */
     
-    .stButton {{
+    /* 1. Forçar o contentor do botão a ocupar 100% */
+    div.stButton {{
         width: 100% !important;
         padding: 0 !important;
-        margin-top: 10px;
-        margin-bottom: 10px;
+        margin-top: 10px !important;
+        margin-bottom: 10px !important;
     }}
     
-    .stButton > button {{
+    /* 2. Forçar o botão em si a ocupar 100% */
+    div.stButton > button {{
         width: 100% !important;
-        display: block !important;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
         height: 3.8em !important;
         background-color: {COR_BOTAO_FUNDO} !important;
         color: {COR_BOTAO_TEXTO} !important;
@@ -86,25 +86,57 @@ st.markdown(f"""
         font-size: 1.1em !important;
         text-transform: uppercase !important;
         box-shadow: 0 4px 6px rgba(0,0,0,0.2) !important;
-        margin: 0 !important;
     }}
-    .stButton > button:active {{ transform: translateY(2px); }}
+    
+    div.stButton > button:active {{ transform: translateY(2px); }}
+    
+    /* Remove espaçamentos internos estranhos */
+    div.stButton > button p {{
+        font-size: 1.1em !important;
+        font-weight: 800 !important;
+    }}
 
-    /* BOTÃO DE VOLTAR */
-    .nav-btn .stButton > button {{
+    /* Botão VOLTAR (Exceção: mais pequeno) */
+    .nav-btn div.stButton {{ width: auto !important; display: inline-block !important; }}
+    .nav-btn div.stButton > button {{
         width: auto !important;
-        min-width: 100px;
+        min-width: 100px !important;
         height: 2.5em !important;
         font-size: 0.9em !important;
         background-color: white !important;
         color: {COR_FUNDO} !important;
         border: none !important;
         box-shadow: none !important;
-        white-space: nowrap !important;
-        padding: 0 15px !important;
+        margin: 0 !important;
     }}
 
-    /* INPUTS DE TEXTO GERAIS */
+    /* === CORREÇÃO CRÍTICA: SELECTBOX (Branco no Branco) === */
+    /* A tua regra global 'div { color: white }' estava a matar o selectbox.
+       Aqui forçamos tudo dentro do selectbox a ser castanho. */
+       
+    /* Caixa Principal e Menu Dropdown */
+    div[data-baseweb="select"] > div, 
+    div[data-baseweb="popover"] > div,
+    ul[data-baseweb="menu"] {{
+        background-color: white !important;
+    }}
+    
+    /* TEXTO e ÍCONES dentro do Selectbox -> CASTANHO OBRIGATÓRIO */
+    div[data-baseweb="select"] span, 
+    div[data-baseweb="select"] svg,
+    div[data-baseweb="select"] p,
+    li[data-baseweb="option"] {{
+        color: {COR_CASTANHO} !important;
+        fill: {COR_CASTANHO} !important; /* Para as setas SVG */
+        font-weight: bold !important;
+    }}
+    
+    /* Opção selecionada no menu */
+    li[data-baseweb="option"][aria-selected="true"] {{
+        background-color: #fce8d4 !important;
+    }}
+
+    /* === INPUTS DE TEXTO (Nome, Email, etc) === */
     .stTextInput > div > div > input, 
     .stNumberInput > div > div > input,
     .stDateInput > div > div > input {{
@@ -115,49 +147,15 @@ st.markdown(f"""
         text-align: left !important;
     }}
     
-    /* --- CORREÇÃO CRÍTICA PARA SELECTBOX (BRANCO NO BRANCO) --- */
-    
-    /* 1. Caixa principal e texto selecionado */
-    div[data-baseweb="select"] > div {{
-        background-color: white !important;
-        color: {COR_CASTANHO} !important;
-        border-color: white !important;
+    /* Ícones de calendário/número */
+    button[kind="secondary"], div[data-baseweb="calendar"] button {{ 
+        color: {COR_CASTANHO} !important; 
     }}
     
-    /* 2. Forçar a cor do texto dentro do select para castanho */
-    div[data-baseweb="select"] span {{
-        color: {COR_CASTANHO} !important;
-    }}
-    
-    /* 3. Forçar a cor do ícone (seta) para castanho */
-    div[data-baseweb="select"] svg {{
-        fill: {COR_CASTANHO} !important;
-        color: {COR_CASTANHO} !important;
-    }}
-    
-    /* 4. Menu dropdown (lista de opções) */
-    ul[data-baseweb="menu"] {{
-        background-color: white !important;
-    }}
-    
-    /* 5. Opções individuais */
-    li[data-baseweb="option"] {{
-        color: {COR_CASTANHO} !important;
-        background-color: white !important;
-    }}
-    
-    /* 6. Opção selecionada/hover na lista */
-    li[data-baseweb="option"]:hover, 
-    li[data-baseweb="option"][aria-selected="true"] {{
-        background-color: #fce8d4 !important;
-        color: {COR_CASTANHO} !important;
-    }}
-    
-    /* Ícones genéricos dentro de inputs */
-    button[kind="secondary"], div[data-baseweb="calendar"] button {{ color: {COR_CASTANHO} !important; }}
-    
+    /* Radio Buttons */
     .stRadio label {{ color: {COR_BRANCO} !important; font-weight: bold; }}
 
+    /* Card de Saldo */
     .saldo-card {{
         background-color: white;
         border-radius: 20px;
@@ -168,6 +166,7 @@ st.markdown(f"""
         box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     }}
     
+    /* Imagens centradas */
     div[data-testid="stImage"] {{
         display: flex;
         justify-content: center;
@@ -265,7 +264,6 @@ def render_logo_big():
     """, unsafe_allow_html=True)
 
 def render_navigation(show_logo=True):
-    # APENAS BOTÃO VOLTAR (Sem logo pequeno)
     st.markdown('<div class="nav-btn">', unsafe_allow_html=True)
     if st.button("⬅ VOLTAR"):
         navegar("home")
@@ -315,7 +313,9 @@ def pagina_home(df):
             border: 2px solid white; 
             box-shadow: 0 4px 6px rgba(0,0,0,0.2); 
             text-transform: uppercase; 
-            display: block; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
             width: 100%;
             margin-top: 10px;">
             🌲 LinkTree Kão Kente
@@ -358,7 +358,7 @@ def pagina_encomendas():
             line-height: 3.8em; height: 3.8em; border-radius: 12px; 
             text-align: center; font-weight: 800; font-size: 1.1em;
             border: 2px solid {COR_BOTAO_TEXTO}; box-shadow: 0 4px 6px rgba(0,0,0,0.2); 
-            text-transform: uppercase; display: block; width: 100%;">
+            text-transform: uppercase; display: flex; align-items: center; justify-content: center; width: 100%;">
             ABRIR EMENTA COMPLETA ↗
         </div>
     </a>
