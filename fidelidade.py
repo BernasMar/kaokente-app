@@ -505,7 +505,7 @@ def pagina_pontos(df):
     </div>
     """, unsafe_allow_html=True)
     
-    st.write("🎁 **Progresso para Recompensas:**")
+    st.write("🎁 **Progresso para recompensas:**")
     for p, custo in PREMIOS_PONTOS.items():
         percentagem = min(user['Pontos'] / custo, 1.0)
         percentagem_txt = int(percentagem * 100)
