@@ -313,15 +313,15 @@ def pagina_home(df):
     user = st.session_state['user_logado']
     
     if user is None:
-        st.markdown("<h3 style='text-align: center; margin-top: 10px;'>Bem vindo ao Kão Kente!<br>Já nos conhecemos?</h3>", unsafe_allow_html=True)
+        st.markdown("<h3 style='text-align: center; margin-top: 10px;'>Bem vindo ao Kão Kente!<br> Já nos conhecemos?</h3>", unsafe_allow_html=True)
     else:
         primeiro_nome = user['Nome'].split(" ")[0]
-        st.markdown(f"<h3 style='text-align: center; margin-top: 10px;'>Bem vindo ao Kão Kente, {primeiro_nome}!<br>O que vai ser hoje?</h3>", unsafe_allow_html=True)
+        st.markdown(f"<h3 style='text-align: center; margin-top: 10px;'>Bem vindo ao Kão Kente, {primeiro_nome}!<br> O que vai ser hoje?</h3>", unsafe_allow_html=True)
 
     st.write("") 
 
     # Botões Largos com use_container_width=True
-    if st.button("🛵 ENCOMENDAR ON-LINE", use_container_width=True):
+    if st.button("🛵 ENCOMENDAR ONLINE", use_container_width=True):
         navegar("encomendas")
 
     st.write("")
@@ -375,7 +375,7 @@ def pagina_home(df):
 def pagina_encomendas():
     render_navigation(show_logo=False)
     
-    st.markdown(f"<h2>Encomendar Online</h2>", unsafe_allow_html=True)
+    st.markdown(f"<h2> Encomendar Online</h2>", unsafe_allow_html=True)
     
     st.markdown(f"""
     <a href="?menu=gest" target="_self" style="text-decoration: none;">
@@ -384,10 +384,12 @@ def pagina_encomendas():
             border-radius: 10px; border: 1px solid #ffeeba;
             margin-bottom: 15px; text-align: center; font-size: 0.9em;
         ">
-            Dica: Se a nossa plataforma de pedidos on-line não aparecer nesta página devido a um aviso de cookies (ou se a quiseres utilizar numa nova janela dedicada), basta clicar no botão abaixo!
+            Dica: Se a nossa plataforma de pedidos online não aparecer nesta página devido a um aviso de cookies (ou se a quiseres utilizar numa nova janela dedicada), basta clicar no botão abaixo!
         </div>
     </a>
     """, unsafe_allow_html=True)
+
+    st.markdown("<br>", unsafe_allow_html=True)
 
     st.markdown(f"""
     <a href="{URL_ENCOMENDAS}" target="_blank" style="text-decoration: none;">
@@ -422,8 +424,8 @@ def pagina_login_menu(df):
     
     with tab_login:
         st.write("")
-        st.markdown("<p style='text-align: center'>Podes entrar com Telemóvel ou E-mail.</p>", unsafe_allow_html=True)
-        login_user = st.text_input("Telemóvel ou E-mail")
+        st.markdown("<p style='text-align: center'>Podes entrar com telemóvel ou e-mail.</p>", unsafe_allow_html=True)
+        login_user = st.text_input("Telemóvel ou e-mail")
         login_pass = st.text_input("Palavra-passe", type="password")
         if st.button("ENTRAR", use_container_width=True):
             input_limpo = login_user.strip()
@@ -439,16 +441,16 @@ def pagina_login_menu(df):
 
     with tab_registo:
         st.write("")
-        st.markdown("**Preenche os dados para aderir ao clube:**")
+        st.markdown("**Preenche os teus dados para te juntares a nós:**")
         r_nome = st.text_input("Nome próprio")
         r_apelido = st.text_input("Apelido")
         r_tel = st.text_input("Número de telemóvel")
         r_email = st.text_input("E-mail")
         r_pass1 = st.text_input("Palavra-passe", type="password", key="p1")
-        r_pass2 = st.text_input("Repetir Palavra-passe", type="password", key="p2")
+        r_pass2 = st.text_input("Repetir palavra-passe", type="password", key="p2")
         
         # NOVA LÓGICA DE DATA E IDADE
-        r_nascimento = st.date_input("Data de Nascimento", min_value=date(1920, 1, 1), max_value=date.today(), format="DD/MM/YYYY")
+        r_nascimento = st.date_input("Data de nascimento", min_value=date(1920, 1, 1), max_value=date.today(), format="DD/MM/YYYY")
         idade_calc = calcular_idade(r_nascimento)
         
         tipo_final = "Normal"
@@ -458,8 +460,8 @@ def pagina_login_menu(df):
             if resp_escola == "Sim":
                 tipo_final = "Estudante"
         
-        r_comida = st.text_input("Comida Favorita no Kão Kente")
-        r_local = st.text_input("Localidade de Residência")
+        r_comida = st.text_input("Comida favorita no Kão Kente")
+        r_local = st.text_input("Localidade de residência")
         
         st.write("")
         if st.button("CRIAR CONTA AGORA", use_container_width=True):
