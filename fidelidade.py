@@ -429,7 +429,10 @@ def pagina_login_menu(df):
         login_pass = st.text_input("Palavra-passe", type="password")
         if st.button("ENTRAR", use_container_width=True):
             input_limpo = login_user.strip()
-            u_tel = df[(df['Telemovel'] == input_limpo) & (df['Password'] == login_pass)]
+            
+            # CORREÇÃO: Procura pelo número simples OU pelo número com o apóstrofo atrás
+            u_tel = df[((df['Telemovel'] == input_limpo) | (df['Telemovel'] == "'" + input_limpo)) & (df['Password'] == login_pass)]
+            
             u_mail = df[(df['Email'].str.lower() == input_limpo.lower()) & (df['Password'] == login_pass)]
             user_found = None
             if not u_tel.empty: user_found = u_tel.iloc[0]
@@ -464,7 +467,7 @@ def pagina_login_menu(df):
         r_local = st.text_input("Localidade de residência")
         
         st.write("")
-        if st.button("CRIAR CONTA AGORA", use_container_width=True):
+        if st.button("CRIAR CONTA", use_container_width=True):
             if not (r_nome and r_tel and r_email and r_pass1):
                 st.error("Preenche os campos obrigatórios.")
             elif r_pass1 != r_pass2:
