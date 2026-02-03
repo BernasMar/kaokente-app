@@ -453,7 +453,7 @@ def pagina_login_menu(df):
 
     with tab_registo:
         st.write("")
-        st.markdown("**Preenche os dados para aderir ao clube:**")
+        st.markdown("**Preenche os teus dados para te juntares a nós:**")
         
         # --- SOLUÇÃO (3): FORMULÁRIO DE REGISTO ---
         with st.form("form_registo"):
