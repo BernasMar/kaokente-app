@@ -203,7 +203,7 @@ st.markdown(f"""
     /* 2. Texto dos dias, botões e cabeçalho a Branco */
     div[data-baseweb="calendar"] button,
     div[data-baseweb="calendar"] div {{
-        color: white !important;
+        color: #f68625 !important;
     }}
     
     /* 3. Setas de navegação a Branco */
@@ -215,8 +215,8 @@ st.markdown(f"""
     /* 4. O DROPDOWN DO ANO/MÊS (A Correção Crítica) */
     /* Isto garante que a lista que abre para escolher o ano é Castanha no Branco */
     ul[data-baseweb="menu"] li[data-baseweb="option"] {{
-        background-color: white !important;
-        color: #946128 !important; /* Castanho */
+        background-color: #946128 !important;
+        color: #ffffff !important; /* Castanho */
     }}
     
     /* 5. Dia Selecionado ou Hover (Branco com texto Laranja para contraste) */
