@@ -60,8 +60,10 @@ st.markdown(f"""
         font-family: sans-serif;
     }}
 
-    /* === BOTÕES (ESTILO SIMPLES) === */
-    .stButton > button {{
+    /* === BOTÕES (NORMAIS E FORMULÁRIOS) === */
+    /* Apanha botões normais (.stButton) e botões de submissão (stFormSubmitButton) */
+    .stButton > button,
+    div[data-testid="stFormSubmitButton"] > button {{
         background-color: {COR_BOTAO_FUNDO} !important;
         color: {COR_BOTAO_TEXTO} !important;
         border: 2px solid {COR_BOTAO_TEXTO} !important;
@@ -72,7 +74,17 @@ st.markdown(f"""
         height: 3.5em !important;
         box-shadow: 0 4px 6px rgba(0,0,0,0.2) !important;
     }}
-    .stButton > button:active {{ transform: translateY(2px); }}
+
+    /* Garante que o texto dentro do botão fica mesmo azul */
+    .stButton > button p,
+    div[data-testid="stFormSubmitButton"] > button p {{
+        color: {COR_BOTAO_TEXTO} !important;
+    }}
+
+    .stButton > button:active,
+    div[data-testid="stFormSubmitButton"] > button:active {{ 
+        transform: translateY(2px); 
+    }}
     
     /* Forçar texto dentro do botão a ser AZUL (sobrepor regra geral) */
     .stButton > button p {{
