@@ -416,9 +416,9 @@ def pagina_home(df):
 
     st.markdown("<br>", unsafe_allow_html=True)
 
-    # Botão LinkTree (Navegação na mesma janela para funcionar em Android)
+    # Botão LinkTree Corrigido (Clicável e com Animação)
     st.markdown(f"""
-    <a href="{URL_LINKTREE}" target="_top" class="linktree-btn">
+    <a href="{URL_LINKTREE}" target="_blank" class="linktree-btn">
         <div>🌲 LinkTree Kão Kente</div>
     </a>
     """, unsafe_allow_html=True)
@@ -454,7 +454,7 @@ def pagina_encomendas():
     st.markdown("<br>", unsafe_allow_html=True)
 
     st.markdown(f"""
-    <a href="{URL_ENCOMENDAS}" target="_top" style="text-decoration: none;">
+    <a href="{URL_ENCOMENDAS}" target="_blank" style="text-decoration: none;">
         <div style="
             background-color: {COR_BOTAO_FUNDO}; color: {COR_BOTAO_TEXTO}; 
             line-height: 3.5em; height: 3.5em; border-radius: 12px; 
