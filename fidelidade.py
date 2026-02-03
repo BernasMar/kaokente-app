@@ -113,6 +113,19 @@ st.markdown(f"""
         border-radius: 8px;
     }}
 
+    /* === CAIXAS DE HISTÓRICO (TEXT AREAS) === */
+    .stTextArea textarea {{
+        background-color: #946128 !important; /* Fundo Castanho */
+        color: #ffffff !important;            /* Texto Branco */
+        caret-color: #ffffff !important;      /* Cursor (tracinho a piscar) Branco */
+        border: 1px solid #ffffff !important; /* Borda Branca para realçar */
+    }}
+    
+    /* Cor do rótulo "Histórico" (opcional, caso não esteja já branco) */
+    .stTextArea label {{
+        color: #ffffff !important;
+    }}
+
     /* === CORREÇÃO "NUCLEAR" PARA SELECTBOX (DROPDOWNS) === */
     /* Força TUDO (*) dentro do seletor a ser castanho */
     div[data-baseweb="select"] * {{
@@ -636,7 +649,7 @@ def pagina_admin_panel(df):
             st.divider()
             st.markdown(f"<h4 style='color: {COR_CASTANHO} !important;'>📜 Histórico do Cliente</h4>", unsafe_allow_html=True)
             st.text_area("Histórico Admin", value=d['Historico'], height=300, disabled=True, label_visibility="collapsed")
-            
+
         with t3:
             st.markdown("### Editar Dados")
             with st.form("edit"):
