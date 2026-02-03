@@ -476,11 +476,11 @@ def pagina_login_menu(df):
             r_tel = st.text_input("Telemóvel") 
             
             r_email = st.text_input("E-mail")
-            r_pass1 = st.text_input("Palavra-passe", type="password", key="p1")
-            r_pass2 = st.text_input("Repetir Palavra-passe", type="password", key="p2")
+            r_pass1 = st.text_input("Criar palavra-passe", type="password", key="p1")
+            r_pass2 = st.text_input("Repetir palavra-passe", type="password", key="p2")
             
             # --- SOLUÇÃO (2): value=None para vir vazio por defeito ---
-            r_nascimento = st.date_input("Data de Nascimento", value=None, min_value=date(1920, 1, 1), max_value=date.today(), format="DD/MM/YYYY")
+            r_nascimento = st.date_input("Data de nascimento", value=None, min_value=date(1920, 1, 1), max_value=date.today(), format="DD/MM/YYYY")
             
             # Cálculo de idade (protegido contra None)
             idade_calc = calcular_idade(r_nascimento) if r_nascimento else 0
@@ -493,8 +493,8 @@ def pagina_login_menu(df):
                 if resp_escola == "Sim":
                     tipo_final = "Estudante"
             
-            r_comida = st.text_input("Comida Favorita no Kão Kente")
-            r_local = st.text_input("Localidade de Residência")
+            r_comida = st.text_input("Comida favorita no Kão Kente")
+            r_local = st.text_input("Localidade de residência")
             
             st.write("")
             
@@ -568,6 +568,10 @@ def pagina_pontos(df):
         </div>
         """, unsafe_allow_html=True)
 
+    st.divider()
+    st.markdown(f"<h4 style='color: {COR_CASTANHO} !important;'>📜 Histórico de Movimentos</h4>", unsafe_allow_html=True)
+    st.text_area("Histórico", value=user['Historico'], height=300, disabled=True, label_visibility="collapsed")
+
 # =========================================================
 # PÁGINA: ADMIN
 # =========================================================
@@ -628,6 +632,11 @@ def pagina_admin_panel(df):
                     save_data(df)
                     st.success("Produto resgatado com sucesso")
                 else: st.error("Saldo insuficiente")
+
+            st.divider()
+            st.markdown(f"<h4 style='color: {COR_CASTANHO} !important;'>📜 Histórico do Cliente</h4>", unsafe_allow_html=True)
+            st.text_area("Histórico Admin", value=d['Historico'], height=300, disabled=True, label_visibility="collapsed")
+            
         with t3:
             st.markdown("### Editar Dados")
             with st.form("edit"):
