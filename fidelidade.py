@@ -623,6 +623,9 @@ def pagina_admin_panel(df):
     st.title("🔐 Gestão")
 
     if st.button("🔄 ATUALIZAR DADOS", use_container_width=True):
+        # Guarda o cliente que está atualmente na caixa de seleção (se existir)
+        if "admin_sel_cliente" in st.session_state:
+            st.session_state['cliente_a_manter'] = st.session_state["admin_sel_cliente"]
         st.cache_data.clear()
         st.rerun()
 
@@ -630,7 +633,22 @@ def pagina_admin_panel(df):
     df_show = df.copy()
     if q: df_show = df[df['Nome'].str.lower().str.contains(q.lower()) | df['Telemovel'].str.contains(q)]
     opcoes = df_show['Telemovel'].tolist()
-    sel = st.selectbox("Selecionar Cliente", opcoes, format_func=lambda x: f"{df[df['Telemovel']==x]['Nome'].values[0]} {df[df['Telemovel']==x]['Apelido'].values[0]} ({x})") if opcoes else None
+    
+    # Descobrir qual a posição (index) do cliente que queremos manter
+    idx_inicial = 0
+    if 'cliente_a_manter' in st.session_state:
+        # Se o cliente guardado ainda existir na lista (ex: na pesquisa atual), seleciona-o
+        if st.session_state['cliente_a_manter'] in opcoes:
+            idx_inicial = opcoes.index(st.session_state['cliente_a_manter'])
+
+    # Adicionámos 'index' e 'key' para ligar tudo
+    sel = st.selectbox(
+        "Selecionar Cliente", 
+        opcoes, 
+        index=idx_inicial,
+        key="admin_sel_cliente",
+        format_func=lambda x: f"{df[df['Telemovel']==x]['Nome'].values[0]} {df[df['Telemovel']==x]['Apelido'].values[0]} ({x})"
+    ) if opcoes else None
     
     if sel:
         d = df[df['Telemovel'] == sel].iloc[0]
