@@ -104,6 +104,36 @@ st.markdown(f"""
         color: {COR_FUNDO} !important;
     }}
 
+    /* === BOTÃO LINKTREE PERSONALIZADO === */
+    a.linktree-btn {{
+        display: block !important;
+        width: 100% !important;
+        background-color: {COR_VERDE_CLARO} !important; /* Fundo Verde */
+        color: white !important;                         /* Texto Branco */
+        border: 2px solid white !important;
+        border-radius: 12px !important;
+        text-decoration: none !important;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        margin-top: 10px;
+        transition: transform 0.1s;
+    }}
+    /* Animação de ir abaixo ao clicar */
+    a.linktree-btn:active {{
+        transform: translateY(2px);
+        box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    }}
+    /* Alinhamento do texto */
+    a.linktree-btn div {{
+        height: 3.5em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 1.1em;
+        text-transform: uppercase;
+        color: white !important;
+    }}
+
     /* === INPUTS DE TEXTO === */
     .stTextInput > div > div > input, 
     .stNumberInput > div > div > input,
@@ -366,27 +396,10 @@ def pagina_home(df):
 
     st.markdown("<br>", unsafe_allow_html=True)
 
+    # Botão LinkTree Corrigido (Clicável e com Animação)
     st.markdown(f"""
-    <a href="{URL_LINKTREE}" target="_blank" style="text-decoration: none;">
-        <div style="
-            background-color: {COR_VERDE_CLARO}; 
-            color: white; 
-            line-height: 3.5em;
-            height: 3.5em;
-            border-radius: 12px; 
-            text-align: center; 
-            font-weight: 800; 
-            font-size: 1.1em;
-            border: 2px solid white; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2); 
-            text-transform: uppercase; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center;
-            width: 100%;
-            margin-top: 10px;">
-            🌲 LinkTree Kão Kente
-        </div>
+    <a href="{URL_LINKTREE}" target="_blank" class="linktree-btn">
+        <div>🌲 LinkTree Kão Kente</div>
     </a>
     """, unsafe_allow_html=True)
     
