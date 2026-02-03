@@ -23,6 +23,10 @@ if "menu" in st.query_params and st.query_params["menu"] == "gest":
     if st.session_state.get('pagina') != 'admin_panel':
         st.session_state['pagina'] = 'admin_login'
 
+# --- NOVO: ACESSO DIRETO (LINK ELIMINAR CONTA) ---
+if "eliminarconta" in st.query_params:
+    st.session_state['pagina'] = 'texto_eliminacao'
+
 # --- FUNÇÃO IMAGEM ---
 def get_image_base64(path):
     try:
@@ -268,7 +272,6 @@ URL_LINKTREE = "https://linktr.ee/KaoKente"
 # --- NAVEGAÇÃO ---
 if 'pagina' not in st.session_state: st.session_state['pagina'] = "home"
 if 'user_logado' not in st.session_state: st.session_state['user_logado'] = None
-if 'site_externo' not in st.session_state: st.session_state['site_externo'] = None
 
 def navegar(destino):
     st.query_params.clear()
@@ -384,32 +387,6 @@ def render_navigation(show_logo=True):
         navegar("home")
     st.markdown('</div>', unsafe_allow_html=True)
 
-def render_site_interno():
-    # 1. Botão de Fechar no topo (Estilo "Voltar" nativo)
-    st.markdown(f"""
-        <style>
-        .btn-fechar {{
-            display: block; width: 100%; padding: 10px;
-            background-color: #b71c1c; color: white;
-            text-align: center; border-radius: 8px; font-weight: bold;
-            text-decoration: none; margin-bottom: 10px;
-            border: 2px solid white; cursor: pointer;
-        }}
-        </style>
-    """, unsafe_allow_html=True)
-    
-    if st.button("❌ FECHAR E VOLTAR AO KÃO KENTE", use_container_width=True):
-        st.session_state['site_externo'] = None
-        st.rerun()
-        
-    # 2. O Site Externo (Ocupa o ecrã todo)
-    url = st.session_state['site_externo']
-    try:
-        # Altura 1200 garante que ocupa todo o scroll do telemóvel
-        components.iframe(url, height=1200, scrolling=True)
-    except:
-        st.error("Não foi possível carregar o site.")
-
 # =========================================================
 # PÁGINA: HOME
 # =========================================================
@@ -443,10 +420,12 @@ def pagina_home(df):
 
     st.markdown("<br>", unsafe_allow_html=True)
 
-    # Botão Simples que ativa o modo interno
-    if st.button("🌲 LINKTREE KÃO KENTE", use_container_width=True):
-        st.session_state['site_externo'] = URL_LINKTREE
-        st.rerun()
+    # Botão LinkTree Corrigido (Clicável e com Animação)
+    st.markdown(f"""
+    <a href="{URL_LINKTREE}" target="_blank" class="linktree-btn">
+        <div>🌲 LinkTree Kão Kente</div>
+    </a>
+    """, unsafe_allow_html=True)
     
     if user is not None:
         st.write("")
@@ -478,11 +457,18 @@ def pagina_encomendas():
 
     st.markdown("<br>", unsafe_allow_html=True)
 
-    # Botão gigante para abrir a ementa
-    st.markdown("<br>", unsafe_allow_html=True)
-    if st.button("ABRIR EMENTA COMPLETA ↗", use_container_width=True):
-        st.session_state['site_externo'] = URL_ENCOMENDAS
-        st.rerun()
+    st.markdown(f"""
+    <a href="{URL_ENCOMENDAS}" target="_blank" style="text-decoration: none;">
+        <div style="
+            background-color: {COR_BOTAO_FUNDO}; color: {COR_BOTAO_TEXTO}; 
+            line-height: 3.5em; height: 3.5em; border-radius: 12px; 
+            text-align: center; font-weight: 800; font-size: 1.1em;
+            border: 2px solid {COR_BOTAO_TEXTO}; box-shadow: 0 4px 6px rgba(0,0,0,0.2); 
+            text-transform: uppercase; display: flex; align-items: center; justify-content: center; width: 100%;">
+            ABRIR EMENTA COMPLETA ↗
+        </div>
+    </a>
+    """, unsafe_allow_html=True)
     
     st.markdown("<br>", unsafe_allow_html=True) 
     
@@ -777,19 +763,65 @@ def pagina_admin_panel(df):
             pass_master = st.text_input("Palavra-passe", type="password")
             if pass_master == "noronha": st.dataframe(df)
 
+# =========================================================
+# PÁGINA: POLÍTICA DE ELIMINAÇÃO (Google Play)
+# =========================================================
+def pagina_texto_eliminacao():
+    # Removemos a navegação normal para ficar uma página limpa de "aviso legal"
+    st.markdown("""
+    <div style="background-color: white; padding: 30px; border-radius: 15px; border: 1px solid #ddd; max-width: 800px; margin: 0 auto;">
+        <h2 style="color: #946128 !important; text-align: left !important;">Eliminação de Conta e Dados – Kão Kente</h2>
+        
+        <p style="color: #333;">O Kão Kente respeita a sua privacidade e o controlo sobre os seus dados pessoais. Em conformidade com as políticas da Google Play, disponibilizamos canais diretos para que possa solicitar a eliminação definitiva da sua conta e das informações associadas.</p>
+        <p style="color: #333;">Pode optar por um de dois métodos para realizar este pedido:</p>
+
+        <h4 style="color: #f68625 !important; text-align: left !important; margin-top: 20px;">Opção 1: Solicitação Presencial (Imediata)</h4>
+        <p style="color: #333;">Pode solicitar a eliminação diretamente no nosso estabelecimento. O processo é realizado pelos nossos funcionários através do sistema de gestão (backoffice) da aplicação.</p>
+        <ul style="color: #333;">
+            <li style="color: #333;"><b>Visite o restaurante:</b> Dirija-se ao nosso balcão durante o horário de expediente.</li>
+            <li style="color: #333;"><b>Solicite a eliminação:</b> Informe um funcionário de que pretende eliminar a sua conta da aplicação.</li>
+            <li style="color: #333;"><b>Conclusão:</b> O funcionário irá localizar o seu registo e proceder à eliminação imediata dos seus dados de acesso.</li>
+        </ul>
+
+        <h4 style="color: #f68625 !important; text-align: left !important; margin-top: 20px;">Opção 2: Solicitação por E-mail (Remota)</h4>
+        <p style="color: #333;">Caso não possa deslocar-se ao restaurante ou já não tenha a aplicação instalada, pode solicitar a eliminação remotamente.</p>
+        <ol style="color: #333;">
+            <li style="color: #333;">Envie um e-mail para <b>bernardomarchana@hotmail.com</b>.</li>
+            <li style="color: #333;">Utilize o assunto: <b>"Eliminar Conta - [O Teu Nome]"</b>.</li>
+            <li style="color: #333;">No corpo do e-mail, indique o endereço de e-mail ou número de telemóvel associado à conta que deseja eliminar.</li>
+            <li style="color: #333;">O nosso suporte processará o pedido e confirmará a eliminação num prazo máximo de 7 dias úteis.</li>
+        </ol>
+
+        <hr>
+
+        <h4 style="color: #946128 !important; text-align: left !important;">Dados que são Eliminados</h4>
+        <p style="color: #333;">Ao concluir o processo (por qualquer uma das vias acima), os seguintes dados serão permanentemente removidos:</p>
+        <ul style="color: #333;">
+            <li style="color: #333;"><b>Identificação:</b> Nome de utilizador, fotografia de perfil, e-mail e número de telefone.</li>
+            <li style="color: #333;"><b>Segurança:</b> Palavras-passe encriptadas e tokens de sessão.</li>
+            <li style="color: #333;"><b>Preferências da App:</b> Endereços de entrega guardados e histórico de favoritos.</li>
+        </ul>
+
+        <h4 style="color: #946128 !important; text-align: left !important;">Dados que são Mantidos (Retenção de Dados)</h4>
+        <p style="color: #333;">Alguns dados específicos serão mantidos após a eliminação da conta, estritamente para cumprimento de obrigações legais e fiscais:</p>
+        <ul style="color: #333;">
+            <li style="color: #333;"><b>Histórico de Transações:</b> Faturas e registos de pedidos concluídos serão mantidos pelo período exigido pela legislação fiscal em vigor. Estes dados deixarão de estar vinculados a uma conta de utilizador ativa e serão arquivados de forma segura.</li>
+        </ul>
+        
+        <br>
+        <div style="text-align: center;">
+            <a href="/" target="_self" style="text-decoration: none; color: #946128; font-weight: bold;">← Voltar à Página Inicial</a>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
 # --- MAIN LOOP ---
 df = load_data()
-
-# LÓGICA NOVA: Se houver um site externo, mostra SÓ isso
-if st.session_state['site_externo'] is not None:
-    render_site_interno()
-
-else:
-    # Lógica Normal da App
-    p = st.session_state['pagina']
-    if p == "home": pagina_home(df)
-    elif p == "encomendas": pagina_encomendas()
-    elif p == "login_menu": pagina_login_menu(df)
-    elif p == "pontos": pagina_pontos(df)
-    elif p == "admin_login": pagina_admin_login()
-    elif p == "admin_panel": pagina_admin_panel(df)
+p = st.session_state['pagina']
+if p == "home": pagina_home(df)
+elif p == "encomendas": pagina_encomendas()
+elif p == "login_menu": pagina_login_menu(df)
+elif p == "pontos": pagina_pontos(df)
+elif p == "admin_login": pagina_admin_login()
+elif p == "admin_panel": pagina_admin_panel(df)
+elif p == "texto_eliminacao": pagina_texto_eliminacao()
