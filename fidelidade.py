@@ -193,18 +193,30 @@ st.markdown(f"""
         background-color: #fce8d4 !important;
     }}
     
-    /* === CORREÇÃO CALENDÁRIO === */
+    /* === CORREÇÃO CALENDÁRIO (FUNDO ESCURO) === */
+    /* Fundo da caixa do calendário */
     div[data-baseweb="calendar"] {{
-        background-color: white !important;
+        background-color: #946128 !important; /* Castanho */
+        color: white !important;
     }}
-    div[data-baseweb="calendar"] button {{
-        color: {COR_CASTANHO} !important;
-    }}
+    
+    /* Botões (Setas, Mês, Ano) e Texto dos Dias */
+    div[data-baseweb="calendar"] button,
     div[data-baseweb="calendar"] div {{
-        color: {COR_CASTANHO} !important;
+        color: white !important;
     }}
+    
+    /* Ícones (Setas de navegação) */
     div[data-baseweb="calendar"] svg {{
-        fill: {COR_CASTANHO} !important;
+        fill: white !important;
+        color: white !important;
+    }}
+    
+    /* Dia Selecionado ou Hover */
+    div[data-baseweb="day"]:hover,
+    div[data-baseweb="calendar"] [aria-selected="true"] {{
+        background-color: #f68625 !important; /* Laranja para destacar */
+        color: white !important;
     }}
 
     /* Ícones e Labels */
