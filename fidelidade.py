@@ -553,6 +553,10 @@ def pagina_pontos(df):
     
     st.markdown(f"<h2>Área Pessoal</h2>", unsafe_allow_html=True)
     st.markdown(f"<h3>{user['Nome']} {user['Apelido']}</h3>", unsafe_allow_html=True)
+
+    if st.button("🔄 ATUALIZAR PÁGINA", use_container_width=True):
+        st.cache_data.clear()
+        st.rerun()
     
     st.markdown(f"""
     <div class="saldo-card">
@@ -610,6 +614,11 @@ def pagina_admin_panel(df):
     st.markdown('</div>', unsafe_allow_html=True)
         
     st.title("🔐 Gestão")
+
+    if st.button("🔄 ATUALIZAR DADOS", use_container_width=True):
+        st.cache_data.clear()
+        st.rerun()
+
     q = st.text_input("🔍 Pesquisar")
     df_show = df.copy()
     if q: df_show = df[df['Nome'].str.lower().str.contains(q.lower()) | df['Telemovel'].str.contains(q)]
