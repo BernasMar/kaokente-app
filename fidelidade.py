@@ -438,21 +438,19 @@ def pagina_login_menu(df):
         st.write("")
         st.markdown("<p style='text-align: center'>Podes entrar com telemóvel ou e-mail</p>", unsafe_allow_html=True)
         
-        # --- SOLUÇÃO (3): FORMULÁRIO DE LOGIN ---
         with st.form("form_login"):
             login_user = st.text_input("Telemóvel ou e-mail")
-            login_pass = st.text_input("Palavra-passe", type="password")
+            # ALTERAÇÃO 1: Mudar para "Password" ajuda o iPhone a detetar que é LOGIN
+            login_pass = st.text_input("Password", type="password")
             
-            # Nota: Dentro de um form, o botão tem de ser st.form_submit_button
             submit_login = st.form_submit_button("ENTRAR", use_container_width=True)
             
             if submit_login:
                 input_limpo = login_user.strip()
-                
-                # Procura pelo número simples OU pelo número com o apóstrofo atrás
+                # Procura normal ou com apóstrofo
                 u_tel = df[((df['Telemovel'] == input_limpo) | (df['Telemovel'] == "'" + input_limpo)) & (df['Password'] == login_pass)]
-                
                 u_mail = df[(df['Email'].str.lower() == input_limpo.lower()) & (df['Password'] == login_pass)]
+                
                 user_found = None
                 if not u_tel.empty: user_found = u_tel.iloc[0]
                 elif not u_mail.empty: user_found = u_mail.iloc[0]
@@ -467,25 +465,19 @@ def pagina_login_menu(df):
         st.write("")
         st.markdown("**Preenche os teus dados para te juntares a nós:**")
         
-        # --- SOLUÇÃO (3): FORMULÁRIO DE REGISTO ---
         with st.form("form_registo"):
             r_nome = st.text_input("Nome próprio")
             r_apelido = st.text_input("Apelido")
-            
-            # --- SOLUÇÃO (1): Label simplificada para evitar sugestão de Cartão de Crédito ---
             r_tel = st.text_input("Telemóvel") 
-            
             r_email = st.text_input("E-mail")
-            r_pass1 = st.text_input("Palavra-passe", type="password", key="p1")
+            
+            # ALTERAÇÃO 2: "Cria uma..." diz ao browser que é NOVO registo
+            r_pass1 = st.text_input("Cria uma Palavra-passe", type="password", key="p1")
             r_pass2 = st.text_input("Repetir Palavra-passe", type="password", key="p2")
             
-            # --- SOLUÇÃO (2): value=None para vir vazio por defeito ---
             r_nascimento = st.date_input("Data de Nascimento", value=None, min_value=date(1920, 1, 1), max_value=date.today(), format="DD/MM/YYYY")
-            
-            # Cálculo de idade (protegido contra None)
             idade_calc = calcular_idade(r_nascimento) if r_nascimento else 0
             
-            # Lógica de Estudante (Só aparece se a data for preenchida e idade <= 19)
             tipo_final = "Normal"
             if r_nascimento and idade_calc > 0 and idade_calc <= 19:
                 st.markdown(f"<p style='font-size:0.9em'>Tens {idade_calc} anos.</p>", unsafe_allow_html=True)
@@ -498,11 +490,9 @@ def pagina_login_menu(df):
             
             st.write("")
             
-            # Botão de submissão do formulário
             submit_registo = st.form_submit_button("CRIAR CONTA AGORA", use_container_width=True)
             
             if submit_registo:
-                # Validações
                 if not (r_nome and r_tel and r_email and r_pass1):
                     st.error("Preenche os campos obrigatórios.")
                 elif r_nascimento is None:
