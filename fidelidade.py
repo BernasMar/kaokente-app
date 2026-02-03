@@ -268,6 +268,7 @@ URL_LINKTREE = "https://linktr.ee/KaoKente"
 # --- NAVEGAÇÃO ---
 if 'pagina' not in st.session_state: st.session_state['pagina'] = "home"
 if 'user_logado' not in st.session_state: st.session_state['user_logado'] = None
+if 'site_externo' not in st.session_state: st.session_state['site_externo'] = None
 
 def navegar(destino):
     st.query_params.clear()
@@ -377,57 +378,37 @@ def render_logo_big():
         </div>
     """, unsafe_allow_html=True)
 
-def botao_url_externa(texto, url):
-    # Cria um ID único para o botão não entrar em conflito
-    html_code = f"""
-    <style>
-        .btn-ext {{
-            background-color: {COR_BOTAO_FUNDO};
-            color: {COR_BOTAO_TEXTO};
-            width: 100%;
-            height: 3.5em;
-            border-radius: 12px;
-            border: 2px solid {COR_BOTAO_TEXTO};
-            font-family: sans-serif;
-            font-weight: 800;
-            font-size: 1.1em;
-            text-transform: uppercase;
-            cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-            transition: transform 0.1s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-        }}
-        .btn-ext:active {{ transform: translateY(2px); }}
-        
-        /* Ajuste específico para o LinkTree (Verde) */
-        .btn-tree {{
-            background-color: {COR_VERDE_CLARO} !important;
-            color: white !important;
-            border: 2px solid white !important;
-        }}
-    </style>
-    
-    <script>
-        function forcarNavegacao() {{
-            window.top.location.href = '{url}';
-        }}
-    </script>
-    
-    <button class="btn-ext {'btn-tree' if 'linktr' in url else ''}" onclick="forcarNavegacao()">
-        {texto}
-    </button>
-    """
-    # Altura 85px para caber o botão e a sombra
-    components.html(html_code, height=85)
-
 def render_navigation(show_logo=True):
     st.markdown('<div class="nav-btn">', unsafe_allow_html=True)
     if st.button("⬅ VOLTAR"):
         navegar("home")
     st.markdown('</div>', unsafe_allow_html=True)
+
+def render_site_interno():
+    # 1. Botão de Fechar no topo (Estilo "Voltar" nativo)
+    st.markdown(f"""
+        <style>
+        .btn-fechar {{
+            display: block; width: 100%; padding: 10px;
+            background-color: #b71c1c; color: white;
+            text-align: center; border-radius: 8px; font-weight: bold;
+            text-decoration: none; margin-bottom: 10px;
+            border: 2px solid white; cursor: pointer;
+        }}
+        </style>
+    """, unsafe_allow_html=True)
+    
+    if st.button("❌ FECHAR E VOLTAR AO KÃO KENTE", use_container_width=True):
+        st.session_state['site_externo'] = None
+        st.rerun()
+        
+    # 2. O Site Externo (Ocupa o ecrã todo)
+    url = st.session_state['site_externo']
+    try:
+        # Altura 1200 garante que ocupa todo o scroll do telemóvel
+        components.iframe(url, height=1200, scrolling=True)
+    except:
+        st.error("Não foi possível carregar o site.")
 
 # =========================================================
 # PÁGINA: HOME
@@ -462,9 +443,10 @@ def pagina_home(df):
 
     st.markdown("<br>", unsafe_allow_html=True)
 
-    # Botão LinkTree com JavaScript Forçado
-    st.write("")
-    botao_url_externa("🌲 LinkTree Kão Kente", URL_LINKTREE)
+    # Botão Simples que ativa o modo interno
+    if st.button("🌲 LINKTREE KÃO KENTE", use_container_width=True):
+        st.session_state['site_externo'] = URL_LINKTREE
+        st.rerun()
     
     if user is not None:
         st.write("")
@@ -496,8 +478,11 @@ def pagina_encomendas():
 
     st.markdown("<br>", unsafe_allow_html=True)
 
-    # Botão Ementa com JavaScript Forçado
-    botao_url_externa("Abrir Ementa Completa ↗", URL_ENCOMENDAS)
+    # Botão gigante para abrir a ementa
+    st.markdown("<br>", unsafe_allow_html=True)
+    if st.button("ABRIR EMENTA COMPLETA ↗", use_container_width=True):
+        st.session_state['site_externo'] = URL_ENCOMENDAS
+        st.rerun()
     
     st.markdown("<br>", unsafe_allow_html=True) 
     
@@ -794,10 +779,17 @@ def pagina_admin_panel(df):
 
 # --- MAIN LOOP ---
 df = load_data()
-p = st.session_state['pagina']
-if p == "home": pagina_home(df)
-elif p == "encomendas": pagina_encomendas()
-elif p == "login_menu": pagina_login_menu(df)
-elif p == "pontos": pagina_pontos(df)
-elif p == "admin_login": pagina_admin_login()
-elif p == "admin_panel": pagina_admin_panel(df)
+
+# LÓGICA NOVA: Se houver um site externo, mostra SÓ isso
+if st.session_state['site_externo'] is not None:
+    render_site_interno()
+
+else:
+    # Lógica Normal da App
+    p = st.session_state['pagina']
+    if p == "home": pagina_home(df)
+    elif p == "encomendas": pagina_encomendas()
+    elif p == "login_menu": pagina_login_menu(df)
+    elif p == "pontos": pagina_pontos(df)
+    elif p == "admin_login": pagina_admin_login()
+    elif p == "admin_panel": pagina_admin_panel(df)
