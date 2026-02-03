@@ -366,11 +366,12 @@ def pagina_home(df):
 
     st.markdown("<br>", unsafe_allow_html=True)
 
+    # Botão LinkTree com HTML Simplificado e Robusto
     st.markdown(f"""
-    <a href="{URL_LINKTREE}" target="_blank" style="text-decoration: none;">
+    <a href="{URL_LINKTREE}" target="_blank" style="text-decoration: none; display: block; width: 100%;">
         <div style="
             background-color: {COR_VERDE_CLARO}; 
-            color: white; 
+            color: {COR_BOTAO_TEXTO}; 
             line-height: 3.5em;
             height: 3.5em;
             border-radius: 12px; 
@@ -384,7 +385,8 @@ def pagina_home(df):
             align-items: center; 
             justify-content: center;
             width: 100%;
-            margin-top: 10px;">
+            margin-top: 10px;
+            cursor: pointer;">
             🌲 LinkTree Kão Kente
         </div>
     </a>
