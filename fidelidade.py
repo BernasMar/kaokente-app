@@ -114,11 +114,15 @@ st.markdown(f"""
     }}
 
     /* === CAIXAS DE HISTÓRICO (TEXT AREAS) === */
-    .stTextArea textarea {{
+    /* Aplica a regras normais e ESPECIFICAMENTE ao estado :disabled */
+    .stTextArea textarea, 
+    .stTextArea textarea:disabled, 
+    .stTextArea textarea[disabled] {{
         background-color: #946128 !important; /* Fundo Castanho */
         color: #ffffff !important;            /* Texto Branco */
-        caret-color: #ffffff !important;      /* Cursor (tracinho a piscar) Branco */
-        border: 1px solid #ffffff !important; /* Borda Branca para realçar */
+        -webkit-text-fill-color: #ffffff !important; /* OBRIGATÓRIO para iPhone/Safari */
+        opacity: 1 !important;                /* Remove transparência de desativado */
+        border: 1px solid #ffffff !important; /* Borda Branca */
     }}
     
     /* Cor do rótulo "Histórico" (opcional, caso não esteja já branco) */
