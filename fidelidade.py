@@ -404,7 +404,7 @@ def pagina_home(df):
     st.write("") 
 
     # Botões Largos com use_container_width=True
-    if st.button("🛵 ENCOMENDAR ONLINE", use_container_width=True):
+    if st.button("🛵 ENCOMENDAR ONLINE / VER MENU", use_container_width=True):
         navegar("encomendas")
 
     st.write("")
