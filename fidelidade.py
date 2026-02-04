@@ -503,10 +503,17 @@ def pagina_login_menu(df):
             if submit_login:
                 input_limpo = login_user.strip()
                 
-                # Procura pelo número simples OU pelo número com o apóstrofo atrás
-                u_tel = df[((df['Telemovel'] == input_limpo) | (df['Telemovel'] == "'" + input_limpo)) & (df['Password'] == login_pass)]
+                # === CORREÇÃO DO LOGIN (IGNORAR O APÓSTROFO) ===
+                # 1. Criamos uma versão "limpa" da coluna Telemovel só para comparar
+                # Isto remove o ' e quaisquer espaços vazios, garantindo que só comparamos números
+                tel_db_limpo = df['Telemovel'].astype(str).str.replace("'", "", regex=False).str.strip()
                 
+                # 2. Verificamos se bate certo (Telemovel Limpo == Input) E (Password == Password)
+                u_tel = df[(tel_db_limpo == input_limpo) & (df['Password'] == login_pass)]
+                
+                # 3. Verificação normal de e-mail
                 u_mail = df[(df['Email'].str.lower() == input_limpo.lower()) & (df['Password'] == login_pass)]
+                
                 user_found = None
                 if not u_tel.empty: user_found = u_tel.iloc[0]
                 elif not u_mail.empty: user_found = u_mail.iloc[0]
