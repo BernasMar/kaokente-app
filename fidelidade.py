@@ -766,54 +766,126 @@ def pagina_admin_panel(df):
 # =========================================================
 # PÁGINA: POLÍTICA DE ELIMINAÇÃO (Google Play)
 # =========================================================
+# =========================================================
+# PÁGINA: POLÍTICA DE ELIMINAÇÃO (Versão "Bonita")
+# =========================================================
 def pagina_texto_eliminacao():
-    # Removemos a navegação normal para ficar uma página limpa de "aviso legal"
-    st.markdown("""
-    <div style="background-color: white; padding: 30px; border-radius: 15px; border: 1px solid #ddd; max-width: 800px; margin: 0 auto;">
-        <h2 style="color: #946128 !important; text-align: left !important;">Eliminação de Conta e Dados – Kão Kente</h2>
+    # 1. Botão Voltar no topo (para ser fácil sair)
+    c1, c2, c3 = st.columns([1, 6, 1])
+    with c2:
+        if st.button("⬅ VOLTAR À APP", use_container_width=True):
+            # Se entrou via link direto, o voltar vai para a home
+            st.session_state['pagina'] = 'home'
+            st.rerun()
+
+    st.write("") # Espaço
+
+    # 2. O Conteúdo Estilizado (HTML + CSS Moderno)
+    st.markdown(f"""
+    <style>
+        .legal-card {{
+            background-color: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border-bottom: 6px solid {COR_BOTAO_FUNDO};
+            color: #333333;
+            font-family: 'Source Sans Pro', sans-serif;
+            line-height: 1.6;
+            margin-bottom: 50px;
+        }}
+        .legal-title {{
+            color: {COR_CASTANHO} !important;
+            font-size: 2em !important;
+            font-weight: 800 !important;
+            text-align: center !important;
+            margin-bottom: 10px !important;
+            text-transform: uppercase;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 20px;
+        }}
+        .legal-subtitle {{
+            color: {COR_BOTAO_FUNDO} !important;
+            font-size: 1.3em !important;
+            font-weight: 700 !important;
+            margin-top: 30px !important;
+            margin-bottom: 10px !important;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }}
+        .legal-text {{
+            color: #444 !important;
+            font-size: 1em;
+            margin-bottom: 15px;
+            text-align: justify;
+        }}
+        .legal-list {{
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid {COR_VERDE_CLARO};
+        }}
+        .legal-list li {{
+            color: #555 !important;
+            margin-bottom: 8px;
+            list-style-type: none;
+        }}
+        .legal-highlight {{
+            font-weight: bold;
+            color: {COR_CASTANHO};
+        }}
+    </style>
+
+    <div class="legal-card">
+        <h1 class="legal-title">Eliminação de Conta e Dados</h1>
         
-        <p style="color: #333;">O Kão Kente respeita a sua privacidade e o controlo sobre os seus dados pessoais. Em conformidade com as políticas da Google Play, disponibilizamos canais diretos para que possa solicitar a eliminação definitiva da sua conta e das informações associadas.</p>
-        <p style="color: #333;">Pode optar por um de dois métodos para realizar este pedido:</p>
+        <p class="legal-text">
+            No <b>Kão Kente</b>, a tua privacidade é prioridade. Em conformidade com as diretrizes da Google Play e o RGPD, disponibilizamos canais diretos e simples para que possas exercer o teu direito ao esquecimento e eliminar a tua conta.
+        </p>
 
-        <h4 style="color: #f68625 !important; text-align: left !important; margin-top: 20px;">Opção 1: Solicitação Presencial (Imediata)</h4>
-        <p style="color: #333;">Pode solicitar a eliminação diretamente no nosso estabelecimento. O processo é realizado pelos nossos funcionários através do sistema de gestão (backoffice) da aplicação.</p>
-        <ul style="color: #333;">
-            <li style="color: #333;"><b>Visite o restaurante:</b> Dirija-se ao nosso balcão durante o horário de expediente.</li>
-            <li style="color: #333;"><b>Solicite a eliminação:</b> Informe um funcionário de que pretende eliminar a sua conta da aplicação.</li>
-            <li style="color: #333;"><b>Conclusão:</b> O funcionário irá localizar o seu registo e proceder à eliminação imediata dos seus dados de acesso.</li>
+        <div class="legal-subtitle">🏪 Opção 1: Presencial (Imediata)</div>
+        <div class="legal-list">
+            <p style="margin-top:0; color:#444;">A forma mais rápida de o fazer é no nosso estabelecimento:</p>
+            <li><b>1. Visita-nos:</b> Dirige-te ao balcão durante o horário de expediente.</li>
+            <li><b>2. Pede:</b> Informa um funcionário que queres apagar a conta da app.</li>
+            <li><b>3. Feito:</b> O funcionário localiza o teu registo e apaga tudo na hora através do nosso sistema.</li>
+        </div>
+
+        <div class="legal-subtitle">📧 Opção 2: Por E-mail (Remota)</div>
+        <div class="legal-list" style="border-left-color: {COR_BOTAO_FUNDO};">
+            <p style="margin-top:0; color:#444;">Se preferires tratar disto à distância:</p>
+            <li>1. Envia um e-mail para: <b style="color:{COR_BOTAO_FUNDO}">bernardomarchana@hotmail.com</b></li>
+            <li>2. Assunto: <b>"Eliminar Conta - [O Teu Nome]"</b></li>
+            <li>3. Corpo: Indica o telemóvel ou e-mail que usaste no registo.</li>
+            <li><i>Confirmaremos a eliminação num prazo máximo de 7 dias úteis.</i></li>
+        </div>
+
+        <div class="legal-subtitle">🗑️ O que acontece aos teus dados?</div>
+        <p class="legal-text">Quando o processo é concluído, <b>apagamos permanentemente</b>:</p>
+        <ul style="color: #444;">
+            <li>A tua identificação (Nome, E-mail, Telemóvel).</li>
+            <li>A tua palavra-passe e chaves de acesso.</li>
+            <li>O teu histórico de moradas e favoritos.</li>
         </ul>
 
-        <h4 style="color: #f68625 !important; text-align: left !important; margin-top: 20px;">Opção 2: Solicitação por E-mail (Remota)</h4>
-        <p style="color: #333;">Caso não possa deslocar-se ao restaurante ou já não tenha a aplicação instalada, pode solicitar a eliminação remotamente.</p>
-        <ol style="color: #333;">
-            <li style="color: #333;">Envie um e-mail para <b>bernardomarchana@hotmail.com</b>.</li>
-            <li style="color: #333;">Utilize o assunto: <b>"Eliminar Conta - [O Teu Nome]"</b>.</li>
-            <li style="color: #333;">No corpo do e-mail, indique o endereço de e-mail ou número de telemóvel associado à conta que deseja eliminar.</li>
-            <li style="color: #333;">O nosso suporte processará o pedido e confirmará a eliminação num prazo máximo de 7 dias úteis.</li>
-        </ol>
-
-        <hr>
-
-        <h4 style="color: #946128 !important; text-align: left !important;">Dados que são Eliminados</h4>
-        <p style="color: #333;">Ao concluir o processo (por qualquer uma das vias acima), os seguintes dados serão permanentemente removidos:</p>
-        <ul style="color: #333;">
-            <li style="color: #333;"><b>Identificação:</b> Nome de utilizador, fotografia de perfil, e-mail e número de telefone.</li>
-            <li style="color: #333;"><b>Segurança:</b> Palavras-passe encriptadas e tokens de sessão.</li>
-            <li style="color: #333;"><b>Preferências da App:</b> Endereços de entrega guardados e histórico de favoritos.</li>
-        </ul>
-
-        <h4 style="color: #946128 !important; text-align: left !important;">Dados que são Mantidos (Retenção de Dados)</h4>
-        <p style="color: #333;">Alguns dados específicos serão mantidos após a eliminação da conta, estritamente para cumprimento de obrigações legais e fiscais:</p>
-        <ul style="color: #333;">
-            <li style="color: #333;"><b>Histórico de Transações:</b> Faturas e registos de pedidos concluídos serão mantidos pelo período exigido pela legislação fiscal em vigor. Estes dados deixarão de estar vinculados a uma conta de utilizador ativa e serão arquivados de forma segura.</li>
-        </ul>
+        <div style="background-color: #fff3cd; padding: 15px; border-radius: 8px; margin-top: 20px; border: 1px solid #ffeeba;">
+            <p style="color: #856404; margin: 0; font-size: 0.9em;">
+                <b>Nota Legal:</b> Dados fiscais (faturas de pedidos antigos) serão mantidos em arquivo seguro pelo período exigido por lei, mas deixarão de estar associados a uma conta ativa.
+            </p>
+        </div>
         
         <br>
-        <div style="text-align: center;">
-            <a href="/" target="_self" style="text-decoration: none; color: #946128; font-weight: bold;">← Voltar à Página Inicial</a>
-        </div>
+        <p style="text-align: center; color: #999; font-size: 0.8em;">Kão Kente App v1.1</p>
     </div>
     """, unsafe_allow_html=True)
+    
+    # Repetir botão em baixo para conveniência
+    c1, c2, c3 = st.columns([1, 6, 1])
+    with c2:
+        if st.button("⬅ VOLTAR À PÁGINA INICIAL", use_container_width=True, key="btn_voltar_baixo"):
+            st.session_state['pagina'] = 'home'
+            st.rerun()
 
 # --- MAIN LOOP ---
 df = load_data()
