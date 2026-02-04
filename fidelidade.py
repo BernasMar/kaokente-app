@@ -764,128 +764,59 @@ def pagina_admin_panel(df):
             if pass_master == "noronha": st.dataframe(df)
 
 # =========================================================
-# PÁGINA: POLÍTICA DE ELIMINAÇÃO (Google Play)
-# =========================================================
-# =========================================================
-# PÁGINA: POLÍTICA DE ELIMINAÇÃO (Versão "Bonita")
+# PÁGINA: POLÍTICA DE ELIMINAÇÃO (Versão Nativa e Limpa)
 # =========================================================
 def pagina_texto_eliminacao():
-    # 1. Botão Voltar no topo (para ser fácil sair)
-    c1, c2, c3 = st.columns([1, 6, 1])
-    with c2:
-        if st.button("⬅ VOLTAR À APP", use_container_width=True):
-            # Se entrou via link direto, o voltar vai para a home
-            st.session_state['pagina'] = 'home'
-            st.rerun()
-
-    st.write("") # Espaço
-
-    # 2. O Conteúdo Estilizado (HTML + CSS Moderno)
-    st.markdown(f"""
-    <style>
-        .legal-card {{
-            background-color: white;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            border-bottom: 6px solid {COR_BOTAO_FUNDO};
-            color: #333333;
-            font-family: 'Source Sans Pro', sans-serif;
-            line-height: 1.6;
-            margin-bottom: 50px;
-        }}
-        .legal-title {{
-            color: {COR_CASTANHO} !important;
-            font-size: 2em !important;
-            font-weight: 800 !important;
-            text-align: center !important;
-            margin-bottom: 10px !important;
-            text-transform: uppercase;
-            border-bottom: 2px solid #eee;
-            padding-bottom: 20px;
-        }}
-        .legal-subtitle {{
-            color: {COR_BOTAO_FUNDO} !important;
-            font-size: 1.3em !important;
-            font-weight: 700 !important;
-            margin-top: 30px !important;
-            margin-bottom: 10px !important;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }}
-        .legal-text {{
-            color: #444 !important;
-            font-size: 1em;
-            margin-bottom: 15px;
-            text-align: justify;
-        }}
-        .legal-list {{
-            background-color: #f9f9f9;
-            padding: 20px;
-            border-radius: 10px;
-            border-left: 4px solid {COR_VERDE_CLARO};
-        }}
-        .legal-list li {{
-            color: #555 !important;
-            margin-bottom: 8px;
-            list-style-type: none;
-        }}
-        .legal-highlight {{
-            font-weight: bold;
-            color: {COR_CASTANHO};
-        }}
-    </style>
-
-    <div class="legal-card">
-        <h1 class="legal-title">Eliminação de Conta e Dados</h1>
-        
-        <p class="legal-text">
-            No <b>Kão Kente</b>, a tua privacidade é prioridade. Em conformidade com as diretrizes da Google Play e o RGPD, disponibilizamos canais diretos e simples para que possas exercer o teu direito ao esquecimento e eliminar a tua conta.
-        </p>
-
-        <div class="legal-subtitle">🏪 Opção 1: Presencial (Imediata)</div>
-        <div class="legal-list">
-            <p style="margin-top:0; color:#444;">A forma mais rápida de o fazer é no nosso estabelecimento:</p>
-            <li><b>1. Visita-nos:</b> Dirige-te ao balcão durante o horário de expediente.</li>
-            <li><b>2. Pede:</b> Informa um funcionário que queres apagar a conta da app.</li>
-            <li><b>3. Feito:</b> O funcionário localiza o teu registo e apaga tudo na hora através do nosso sistema.</li>
-        </div>
-
-        <div class="legal-subtitle">📧 Opção 2: Por E-mail (Remota)</div>
-        <div class="legal-list" style="border-left-color: {COR_BOTAO_FUNDO};">
-            <p style="margin-top:0; color:#444;">Se preferires tratar disto à distância:</p>
-            <li>1. Envia um e-mail para: <b style="color:{COR_BOTAO_FUNDO}">bernardomarchana@hotmail.com</b></li>
-            <li>2. Assunto: <b>"Eliminar Conta - [O Teu Nome]"</b></li>
-            <li>3. Corpo: Indica o telemóvel ou e-mail que usaste no registo.</li>
-            <li><i>Confirmaremos a eliminação num prazo máximo de 7 dias úteis.</i></li>
-        </div>
-
-        <div class="legal-subtitle">🗑️ O que acontece aos teus dados?</div>
-        <p class="legal-text">Quando o processo é concluído, <b>apagamos permanentemente</b>:</p>
-        <ul style="color: #444;">
-            <li>A tua identificação (Nome, E-mail, Telemóvel).</li>
-            <li>A tua palavra-passe e chaves de acesso.</li>
-            <li>O teu histórico de moradas e favoritos.</li>
-        </ul>
-
-        <div style="background-color: #fff3cd; padding: 15px; border-radius: 8px; margin-top: 20px; border: 1px solid #ffeeba;">
-            <p style="color: #856404; margin: 0; font-size: 0.9em;">
-                <b>Nota Legal:</b> Dados fiscais (faturas de pedidos antigos) serão mantidos em arquivo seguro pelo período exigido por lei, mas deixarão de estar associados a uma conta ativa.
-            </p>
-        </div>
-        
-        <br>
-        <p style="text-align: center; color: #999; font-size: 0.8em;">Kão Kente App v1.1</p>
-    </div>
-    """, unsafe_allow_html=True)
+    # Botão Voltar no topo
+    if st.button("⬅ VOLTAR À PÁGINA INICIAL", use_container_width=True):
+        st.session_state['pagina'] = 'home'
+        st.rerun()
     
-    # Repetir botão em baixo para conveniência
-    c1, c2, c3 = st.columns([1, 6, 1])
-    with c2:
-        if st.button("⬅ VOLTAR À PÁGINA INICIAL", use_container_width=True, key="btn_voltar_baixo"):
-            st.session_state['pagina'] = 'home'
-            st.rerun()
+    st.write("") # Espaço vazio
+
+    # Caixa principal com borda (Nativo do Streamlit)
+    with st.container(border=True):
+        st.header("🛡️ Eliminação de Conta e Dados")
+        
+        st.write("""
+        No **Kão Kente**, respeitamos a tua privacidade. Em conformidade com as regras da Google Play, 
+        disponibilizamos formas simples de apagares a tua conta e todos os teus dados.
+        """)
+        
+        st.divider()
+
+        st.subheader("🏪 Opção 1: Presencial (Imediata)")
+        st.info("""
+        **A forma mais rápida.** Basta ires ao restaurante:
+        1. Dirige-te ao balcão.
+        2. Pede a um funcionário para eliminar a conta.
+        3. A eliminação é feita na hora no nosso sistema.
+        """)
+
+        st.write("")
+
+        st.subheader("📧 Opção 2: Por E-mail (Remota)")
+        st.warning("""
+        **Se não puderes ir ao restaurante:**
+        
+        Envia um e-mail para: **bernardomarchana@hotmail.com**
+        * **Assunto:** "Eliminar Conta - [O Teu Nome]"
+        * **Corpo:** Indica o telemóvel ou e-mail usado na conta.
+        
+        *Processamos o pedido em até 7 dias úteis.*
+        """)
+
+        st.divider()
+
+        st.subheader("🗑️ Que dados são apagados?")
+        st.write("Ao pedires a eliminação, removemos permanentemente:")
+        st.markdown("""
+        * ✅ **Identificação:** Nome, E-mail, Telemóvel e Foto.
+        * ✅ **Segurança:** Palavras-passe e sessões ativas.
+        * ✅ **Preferências:** Moradas favoritas e histórico da app.
+        """)
+        
+        st.caption("Nota: Faturas e dados fiscais de pedidos passados são mantidos em arquivo seguro apenas pelo tempo exigido por lei.")
 
 # --- MAIN LOOP ---
 df = load_data()
