@@ -252,31 +252,6 @@ st.markdown(f"""
         display: flex;
         justify-content: center;
     }}
-
-    /* === CORREÇÃO DEFINITIVA DO DROPDOWN (BRUTE FORCE) === */
-    
-    /* 1. Força o fundo da lista (o menu que abre) a ser BRANCO */
-    ul[data-baseweb="menu"] {{
-        background-color: white !important;
-    }}
-
-    /* 2. Força TODO o texto lá dentro a ser CASTANHO (ou preto) */
-    /* Atinge a lista, o item, o div de texto e qualquer span */
-    ul[data-baseweb="menu"] li,
-    ul[data-baseweb="menu"] li div,
-    ul[data-baseweb="menu"] li span {{
-        color: #946128 !important; /* Castanho Kão Kente */
-        caret-color: #946128 !important;
-    }}
-
-    /* 3. Garante que o item selecionado (hover) fica legível */
-    ul[data-baseweb="menu"] li:hover,
-    ul[data-baseweb="menu"] li:hover div,
-    ul[data-baseweb="menu"] li[aria-selected="true"] div {{
-        color: #f68625 !important; /* Laranja quando passas o rato */
-        font-weight: bold !important;
-    }}
-
     </style>
 """, unsafe_allow_html=True)
 
