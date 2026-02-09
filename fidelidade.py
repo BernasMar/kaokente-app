@@ -501,7 +501,7 @@ def pagina_login_menu(df):
             submit_login = st.form_submit_button("ENTRAR", use_container_width=True)
             
             if submit_login:
-                input_limpo = login_user.strip()
+                input_limpo = login_user.strip().replace(" ", "")
                 
                 # === CORREÇÃO DO LOGIN (IGNORAR O APÓSTROFO) ===
                 # 1. Criamos uma versão "limpa" da coluna Telemovel só para comparar
@@ -558,6 +558,7 @@ def pagina_login_menu(df):
         
         # Voltamos ao st.button normal (já está estilizado como laranja pelo CSS)
         if st.button("CRIAR CONTA AGORA", use_container_width=True):
+            r_tel = r_tel.replace(" ", "") # Remove os espaços (ex: "912 345" fica "912345")
             if not (r_nome and r_tel and r_email and r_pass1):
                 st.error("Preenche os campos obrigatórios.")
             elif r_nascimento is None:
