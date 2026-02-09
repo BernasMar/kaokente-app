@@ -252,6 +252,13 @@ st.markdown(f"""
         display: flex;
         justify-content: center;
     }}
+
+    /* === CORREÇÃO DA LISTA (DROPDOWN) === */
+    /* Isto obriga o texto das opções a ficar Castanho para se ler no fundo Branco */
+    li[data-baseweb="option"] span {{
+        color: {COR_CASTANHO} !important; 
+    }}
+
     </style>
 """, unsafe_allow_html=True)
 
